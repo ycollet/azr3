@@ -1,0 +1,18 @@
+This is an LV2 port of AZR-3, originally a VST plugin written by 
+Rumpelrausch Täips. It is a tonewheel organ with drawbars, distortion and 
+rotating speakers. There is also a plugin with only the distortion effect.
+It's all licensed under the GNU GPL version 2, see the file COPYING.
+
+To install, run 
+ 
+ ./configure
+
+and then 
+
+ make
+
+and finally, as root
+
+ make install
+
+
