@@ -102,14 +102,21 @@ typedef void* LV2UI_Controller;
 
 /** This is the type of the host-provided function that the GUI can use to
     send data to a plugin's input ports. The @c buffer parameter must point
-    to a block of data, @c buffer_size bytes large, that contains a valid
-    buffer for the port class of the port with the given index (e.g. a single
-    float value for a control port, or some timestamped and packed MIDI
-    events for a MIDI port). The GUI is responsible for allocating this buffer
-    and deallocating it after the call. There are no timing guarantees at all
-    for this function, although the faster the host can get the data to the 
-    plugin port the better. A function pointer of this type will be provided 
-    to the GUI by the host in the instantiate() function. */
+    to a block of data, @c buffer_size bytes large. The contents of this buffer
+    will depend on the class of the port it's being sent to. For ports of the
+    class lv2:ControlPort, buffer_size should be sizeof(float) and the buffer 
+    contents should be a float value. For ports of the class llext:MidiPort the
+    buffer should contain the data bytes of a single MIDI event, and buffer_size
+    should be the number of bytes in the event. No other port classes are
+    allowed, unless the format and the meaning of the buffer passed to this 
+    function is defined in the extension that specifies that class or in a 
+    separate GUI host feature extension that is required by this GUI.
+    
+    The GUI is responsible for allocating the buffer and deallocating it after
+    the call. There are no timing guarantees at all for this function, although
+    the faster the host can get the data to the plugin port the better. A 
+    function pointer of this type will be provided to the GUI by the host in
+    the instantiate() function. */
 typedef void (*LV2UI_Write_Function)(LV2UI_Controller controller,
 				     uint32_t         port_index,
 				     uint32_t         buffer_size,
@@ -126,7 +133,12 @@ typedef void (*LV2UI_Command_Function)(LV2UI_Controller   controller,
 
 /** This is the type of the host-provided function that the GUI can use to
     request a program change in the host. A function of this type will be 
-    provided to the GUI by the host in the instantiate() function. */
+    provided to the GUI by the host in the instantiate() function. Calling
+    this function does not guarantee that the program will change, it is just
+    a request. If the program does change, the GUI's current_program_changed() 
+    callback will be called, either before or after this function returns
+    depending on whether the GUI host <-> plugin instance communication is
+    synchronous or asynchronous. */
 typedef void (*LV2UI_Program_Function)(LV2UI_Controller controller,
 				       unsigned char    program);
 
@@ -214,8 +226,16 @@ typedef struct _LV2UI_Descriptor {
       the GUI wants to keep it for later use it has to copy the contents to an
       internal buffer.
       
-      This member may be set to NULL if the GUI is
-      not interested in any port events.
+      The buffer is subject to the same rules as the ones for the 
+      LV2_Write_Function type. This means that a plugin GUI may not request a
+      portNotification for a port that has a class other than lv2:ControlPort
+      or llext:MidiPort unless the buffer format and meaning is specified in
+      the extension that defines that port class, or in a separate GUI host 
+      feature extension that is required by the GUI. Any GUI that does that
+      should be considered broken and the host should not use it.
+      
+      This member may be set to NULL if the GUI is not interested in any 
+      port events.
   */
   void (*port_event)(LV2UI_Handle   gui,
 		     uint32_t       port,

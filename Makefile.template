@@ -125,65 +125,40 @@ $(foreach lib,$(LIBRARIES),$(eval $(call LIBRARY_template,$(lib),$(subst .,_,$(l
 
 
 # LV2 PLUGINS
-ifeq ($(UNAME),Darwin)
-LV2PLUGIN_LDFLAGS = -bundle
-LV2PLUGIN_CFLAGS = -fno-common
-else
-LV2PLUGIN_LDFLAGS = -shared -fPIC
-LV2PLUGIN_CFLAGS = -fPIC -DPIC
-endif
 
-define LV2_PLUGIN_template
+define LV2_BUNDLE_template
 
 # variables
 $(2)_SRCPRF = $$(if $$($(2)_SOURCEDIR),$$($(2)_SOURCEDIR),.)
 $(2)_BLDPRF = $$(if $$($(2)_BUILDDIR),$$($(2)_BUILDDIR),$$($(2)_SRCPRF))
-$(2)_FULLSOURCES = $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_SOURCES))
 $(2)_FULLPEGFILES = $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_PEGFILES))
 $(2)_FULLDATA = $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_DATA))
-$(2)_CSOURCES = $$(filter %.c,$$($(2)_FULLSOURCES))
-$(2)_CXXSOURCES = $$(filter %.cpp,$$($(2)_FULLSOURCES))
-$(2)_COBJECTS = $$(subst .c,.o,$$($(2)_CSOURCES))
-$(2)_CXXOBJECTS = $$(subst .cpp,.o,$$($(2)_CXXSOURCES))
-$(2)_OBJECTS = $$($(2)_COBJECTS) $$($(2)_CXXOBJECTS)
-$(2)_LIBNAME = $$($(2)_SRCPRF)/$$(patsubst %.lv2,%.so,$(1))
-$(2)_LOCALLIBRARIES = $$(patsubst lib%.so,-l%,$$(notdir $$($(2)_LIBRARIES)))
-$(2)_LOCALLDFLAGS = $$(patsubst %,-L%,$$(sort $$(dir $$($(2)_LIBRARIES))))
 PROGRAMS += $$($(2)_PROGRAMS)
 PROGRAMS_NOINST += $$($(2)_PROGRAMS)
+$$(foreach mod,$$(subst .,_,$$($(2)_MODULES)),$$(eval $$(mod)_SOURCEDIR = $$($(2)_SRCPRF)))
 MODULES += $$($(2)_MODULES)
 MODULES_NOINST += $$($(2)_MODULES)
-ALL_OBJECTS += $$($(2)_OBJECTS) $$($(2)_LIBNAME)
-ALL_SOURCES += $$($(2)_FULLSOURCES) $$($(2)_FULLPEGFILES)
 ALL_DATA += $$($(2)_FULLDATA)
-LV2_PLUGINS_REAL += $$($(2)_BLDPRF)/$(1)
-LV2_PLUGINS_NOINST += $$(if $$($(2)_NOINST),$(2),)
+LV2_BUNDLES_REAL += $$($(2)_BLDPRF)/$(1)
+LV2_BUNDLES_NOINST += $$(if $$($(2)_NOINST),$(2),)
 $(2)_INSTDIR = $$(if $$($(2)_INSTALLDIR),$$($(2)_INSTALLDIR),$(lv2plugindir))
+EXTRA_DIST += $$(if $$($(2)_MANIFEST),$$($(2)_SRCPRF)/$$($(2)_MANIFEST),)
 
 # targets
-$$($(2)_COBJECTS): Makefile.config
-	$(CC) -c -o $$@ $(LV2PLUGIN_CFLAGS) $(CFLAGS) $$($(2)_CFLAGS) $$($$(patsubst %.o,%_c_CFLAGS,$$(notdir $$@))) $$(subst .o,.c,$$@)
-
-$$($(2)_CXXOBJECTS): Makefile.config
-	$(CXX) -c -o $$@ $(LV2PLUGIN_CFLAGS) $(CFLAGS) $(CXXFLAGS) $$($(2)_CFLAGS) $$($$(patsubst %.o,%_cpp_CFLAGS,$$(notdir $$@))) $$(subst .o,.cpp,$$@)
-
-$$($(2)_LIBNAME): $$($(2)_OBJECTS) $$($(2)_LIBRARIES) $$($(2)_ARCHIVES)
-	$(CXX) $(LV2PLUGIN_LDFLAGS) $$($(2)_OBJECTS) $$($(2)_ARCHIVES) $$($(2)_LOCALLDFLAGS) $$($(2)_LOCALLIBRARIES) $(LDFLAGS) $$($(2)_LDFLAGS) -o $$@
-
-$$($(2)_BLDPRF)/$(1): $$($(2)_LIBNAME) $$($(2)_FULLDATA) $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_PROGRAMS)) $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_MODULES))
+$$($(2)_BLDPRF)/$(1): $$($(2)_FULLDATA) $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_PROGRAMS)) $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_MODULES)) $$(if $$($(2)_MANIFEST),$$($(2)_SRCPRF)/$$($(2)_MANIFEST),)
 	rm -rf $$($(2)_BLDPRF)/$(1)
 	mkdir $$($(2)_BLDPRF)/$(1)
-	cp $$($(2)_LIBNAME) $$($(2)_BLDPRF)/$(1)
 	$$(if $$($(2)_PROGRAMS),cp $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_PROGRAMS)) $$($(2)_BLDPRF)/$(1),)
 	$$(if $$($(2)_MODULES),cp $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_MODULES)) $$($(2)_BLDPRF)/$(1),)
 	$$(if $$($(2)_FULLDATA),cp $$($(2)_FULLDATA) $$($(2)_BLDPRF)/$(1), )
+	$$(if $$($(2)_MANIFEST),cp $$($(2)_SRCPRF)/$$($(2)_MANIFEST) $$($(2)_BLDPRF)/$(1)/manifest.ttl,)
 
 install-$(2): $$($(2)_BLDPRF)/$(1) $$(if $$($(2)_HEADERS),install-$(2)-headers)
 	rm -rf $(DESTDIR)/$$($(2)_INSTDIR)/$(1)
 	mkdir -p $(DESTDIR)/$$($(2)_INSTDIR) && cp -R $$($(2)_BLDPRF)/$(1) $(DESTDIR)/$$($(2)_INSTDIR)
 
 endef
-$(foreach lv2,$(LV2_PLUGINS),$(eval $(call LV2_PLUGIN_template,$(lv2),$(subst .,_,$(lv2)))))
+$(foreach lv2,$(LV2_BUNDLES),$(eval $(call LV2_BUNDLE_template,$(lv2),$(subst .,_,$(lv2)))))
 
 # PEG target
 %.peg: %.ttl $(LV2PEG)
@@ -301,7 +276,7 @@ $(foreach pack,$(DATAPACKS),$(eval $(call DATAPACK_template,$(pack),$(subst .,_,
 
 
 # START HERE
-really-all: $(if $(PKG_DEPS),check-pkg-deps) $(ARCHIVES_REAL) $(LIBRARIES_REAL) $(PROGRAMS_REAL) $(MODULES_REAL) $(LV2_PLUGINS_REAL)
+really-all: $(if $(PKG_DEPS),check-pkg-deps) $(ARCHIVES_REAL) $(LIBRARIES_REAL) $(PROGRAMS_REAL) $(MODULES_REAL) $(LV2_BUNDLES_REAL)
 
 
 
@@ -326,7 +301,7 @@ Makefile.deps: $(DEP_FILES)
 
 # GLOBAL CLEAN
 clean:
-	rm -rf $(ALL_OBJECTS) $(PROGRAMS_REAL) $(MODULES_REAL) $(LIBRARIES) $(ARCHIVES_REAL) $(LV2_PLUGINS_REAL) $(DEP_FILES)
+	rm -rf $(ALL_OBJECTS) $(PROGRAMS_REAL) $(MODULES_REAL) $(LIBRARIES) $(ARCHIVES_REAL) $(LV2_BUNDLES_REAL) $(DEP_FILES)
 
 
 # GLOBAL INSTALL
@@ -340,8 +315,8 @@ LIBRARIES_INST = $(filter-out $(LIBRARIES_NOINST),$(LIBRARIES))
 install-libraries: $(patsubst %,install-%,$(subst .,_,$(LIBRARIES_INST)))
 	$(if $(LIBRARIES),ldconfig -n $(libdir))
 
-LV2_PLUGINS_INST = $(filter-out $(LV2_PLUGINS_NOINST),$(LV2_PLUGINS))
-install-lv2-plugins: $(patsubst %,install-%,$(subst .,_,$(LV2_PLUGINS_INST)))
+LV2_BUNDLES_INST = $(filter-out $(LV2_BUNDLES_NOINST),$(LV2_BUNDLES))
+install-lv2-plugins: $(patsubst %,install-%,$(subst .,_,$(LV2_BUNDLES_INST)))
 
 install-data: $(DATA)
 	$(if $(DATA),mkdir -p $(DESTDIR)/$(pkgdatadir))

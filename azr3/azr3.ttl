@@ -4,7 +4,6 @@
 @prefix ll: <http://ll-plugins.nongnu.org/lv2/namespace#>.
 @prefix llext: <http://ll-plugins.nongnu.org/lv2/ext/>.
 @prefix mm: <http://ll-plugins.nongnu.org/lv2/ext/midimap#>.
-@prefix gg: <http://ll-plugins.nongnu.org/lv2/ext/gtk2gui#>.
 @prefix pg: <http://ll-plugins.nongnu.org/lv2/ext/portgroups#>.
 @prefix plug: <http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0/>.
 
@@ -31,7 +30,6 @@ plug:speakers pg:subgroupOf plug:fx.
   a lv2:Plugin;
   doap:name "AZR3";
   doap:license <http://usefulinc.com/doap/licenses/gpl>;
-  gg:gui <http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0/gui>;
   ll:defaultPresets <presets.ttl>;
   ll:svgIcon <icon.svg>;
       
@@ -1004,6 +1002,3 @@ plug:speakers pg:subgroupOf plug:fx.
     pg:membership [ pg:group plug:output; pg:role pg:rightChannel; ];
   ].
 
-<http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0/gui> 
-  gg:binary <azr3_gtk.so>;
-  gg:optionalFeature gg:fixedSize.
