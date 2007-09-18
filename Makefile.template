@@ -11,7 +11,7 @@ pkgdocdir = $(docdir)/$(PACKAGE_NAME)
 includedir = $(prefix)/include
 pkgincludedir = $(includedir)/$(PACKAGE_NAME)
 lv2plugindir = $(libdir)/lv2
-LV2PEG = lv2peg
+LV2PEG = programs/lv2peg/lv2peg
 
 # Don't modify any variables below this line
 UNAME = $(shell uname)
@@ -95,6 +95,7 @@ $(2)_LOCALLDFLAGS = $$(patsubst %,-L%,$$(sort $$(dir $$($(2)_LIBRARIES))))
 ALL_OBJECTS += $$($(2)_OBJECTS)
 ALL_SOURCES += $$($(2)_FULLSOURCES)
 LIBRARIES_REAL += $$($(2)_BLDPRF)/$(1)
+LIBRARIES_NOINST += $$(if $$($(2)_NOINST),$(2),)
 ALL_LIBHEADER_INSTALLS += $$(if $$($(2)_HEADERS),install-$(2)-headers)
 $(2)_INSTDIR = $$(if $$($(2)_INSTALLDIR),$$($(2)_INSTALLDIR),$(libdir))
 
@@ -149,11 +150,14 @@ $(2)_LIBNAME = $$($(2)_SRCPRF)/$$(patsubst %.lv2,%.so,$(1))
 $(2)_LOCALLIBRARIES = $$(patsubst lib%.so,-l%,$$(notdir $$($(2)_LIBRARIES)))
 $(2)_LOCALLDFLAGS = $$(patsubst %,-L%,$$(sort $$(dir $$($(2)_LIBRARIES))))
 PROGRAMS += $$($(2)_PROGRAMS)
+PROGRAMS_NOINST += $$($(2)_PROGRAMS)
 MODULES += $$($(2)_MODULES)
+MODULES_NOINST += $$($(2)_MODULES)
 ALL_OBJECTS += $$($(2)_OBJECTS) $$($(2)_LIBNAME)
 ALL_SOURCES += $$($(2)_FULLSOURCES) $$($(2)_FULLPEGFILES)
 ALL_DATA += $$($(2)_FULLDATA)
 LV2_PLUGINS_REAL += $$($(2)_BLDPRF)/$(1)
+LV2_PLUGINS_NOINST += $$(if $$($(2)_NOINST),$(2),)
 $(2)_INSTDIR = $$(if $$($(2)_INSTALLDIR),$$($(2)_INSTALLDIR),$(lv2plugindir))
 
 # targets
@@ -182,7 +186,7 @@ endef
 $(foreach lv2,$(LV2_PLUGINS),$(eval $(call LV2_PLUGIN_template,$(lv2),$(subst .,_,$(lv2)))))
 
 # PEG target
-%.peg: %.ttl
+%.peg: %.ttl $(LV2PEG)
 	$(LV2PEG) $*.ttl $@
 
 # END OF LV2 PLUGINS
@@ -205,6 +209,7 @@ $(1)_LOCALLDFLAGS = $$(patsubst %,-L%,$$(sort $$(dir $$($(1)_LIBRARIES))))
 ALL_OBJECTS += $$($(1)_OBJECTS)
 ALL_SOURCES += $$($(1)_FULLSOURCES)
 PROGRAMS_REAL += $$($(1)_BLDPRF)/$(1)
+PROGRAMS_NOINST += $$(if $$($(1)_NOINST),$(1),)
 
 # targets
 $$($(1)_COBJECTS): Makefile.config
@@ -253,6 +258,7 @@ ALL_OBJECTS += $$($(2)_OBJECTS)
 ALL_SOURCES += $$($(2)_FULLSOURCES)
 $(2)_INSTDIR = $$(if $$($(2)_INSTALLDIR),$$($(2)_INSTALLDIR),$(pkglibdir))
 MODULES_REAL += $$($(2)_BLDPRF)/$(1)
+MODULES_NOINST += $$(if $$($(2)_NOINST),$(2),)
 
 # targets
 $$($(2)_COBJECTS): Makefile.config
@@ -324,14 +330,18 @@ clean:
 
 
 # GLOBAL INSTALL
-install-programs: $(patsubst %,install-%,$(subst .,_,$(PROGRAMS)))
+PROGRAMS_INST = $(filter-out $(PROGRAMS_NOINST),$(PROGRAMS))
+install-programs: $(patsubst %,install-%,$(subst .,_,$(PROGRAMS_INST)))
 
-install-modules: $(patsubst %,install-%,$(subst .,_,$(MODULES)))
+MODULES_INST = $(filter-out $(MODULES_NOINST),$(MODULES))
+install-modules: $(patsubst %,install-%,$(subst .,_,$(MODULES_INST)))
 
-install-libraries: $(patsubst %,install-%,$(subst .,_,$(LIBRARIES)))
+LIBRARIES_INST = $(filter-out $(LIBRARIES_NOINST),$(LIBRARIES))
+install-libraries: $(patsubst %,install-%,$(subst .,_,$(LIBRARIES_INST)))
 	$(if $(LIBRARIES),ldconfig -n $(libdir))
 
-install-lv2-plugins: $(patsubst %,install-%,$(subst .,_,$(LV2_PLUGINS)))
+LV2_PLUGINS_INST = $(filter-out $(LV2_PLUGINS_NOINST),$(LV2_PLUGINS))
+install-lv2-plugins: $(patsubst %,install-%,$(subst .,_,$(LV2_PLUGINS_INST)))
 
 install-data: $(DATA)
 	$(if $(DATA),mkdir -p $(DESTDIR)/$(pkgdatadir))

@@ -51,8 +51,10 @@ public:
   AZR3GUI(const std::string& URI,
 	  const std::string& bundle_path,
 	  LV2UI_Write_Function write_function,
+	  LV2UI_Program_Function program_function,
 	  LV2UI_Controller controller)
     : m_write_function(write_function),
+      m_program_function(program_function),
       m_controller(controller),
       showing_fx_controls(true),
       current_program(0),
@@ -273,7 +275,7 @@ public:
 
   
   void program_changed(int program) {
-
+    m_program_function(m_controller, program);
   }
 
   
@@ -584,6 +586,7 @@ protected:
 
 
   LV2UI_Write_Function m_write_function;
+  LV2UI_Program_Function m_program_function;
   LV2UI_Controller m_controller;
 
   bool showing_fx_controls;
@@ -615,11 +618,13 @@ namespace {
 			   const char* plugin_uri,
 			   const char* bundle_path,
 			   LV2UI_Write_Function write_function,
+			   LV2UI_Command_Function command_function,
+			   LV2UI_Program_Function program_function,
 			   LV2UI_Controller controller,
 			   GtkWidget** widget,
 			   const LV2_Host_Feature** features) {
     AZR3GUI* gui = new AZR3GUI(plugin_uri, bundle_path, 
-			       write_function, controller);
+			       write_function, program_function, controller);
     *widget = GTK_WIDGET(gui->gobj());
     return gui;
   }
@@ -637,6 +642,26 @@ namespace {
   }
   
   
+  void program_added(LV2UI_Handle handle, unsigned char number,
+		     const char* name) {
+    static_cast<AZR3GUI*>(handle)->add_program(number, name);
+  }
+  
+
+  void program_removed(LV2UI_Handle handle, unsigned char number) {
+    static_cast<AZR3GUI*>(handle)->remove_program(number);
+  }
+
+
+  void programs_cleared(LV2UI_Handle handle) {
+    static_cast<AZR3GUI*>(handle)->clear_programs();
+  }
+
+
+  void current_program_changed(LV2UI_Handle handle, unsigned char number) {
+    static_cast<AZR3GUI*>(handle)->set_program(number);
+  }
+
 }
 
 
@@ -648,6 +673,11 @@ extern "C" {
       &instantiate,
       &cleanup,
       &port_event,
+      0,
+      &program_added,
+      &program_removed,
+      &programs_cleared,
+      &current_program_changed,
       0
     };
     if (index == 0)

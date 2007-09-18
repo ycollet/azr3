@@ -115,7 +115,22 @@ typedef void (*LV2UI_Write_Function)(LV2UI_Controller controller,
 				     uint32_t         buffer_size,
 				     const void*      buffer);
 
-  /** */
+/** This is the type of the host-provided function that the GUI can use to
+    send arbitrary commands to the plugin. The parameters after the first one
+    should be const char* variables, terminated by a NULL pointer, and will be
+    interpreted as a command with arguments. A function of this type will be 
+    provided to the GUI by the host in the instantiate() function. */
+typedef void (*LV2UI_Command_Function)(LV2UI_Controller   controller,
+				       uint32_t           argc,
+				       const char* const* argv);
+
+/** This is the type of the host-provided function that the GUI can use to
+    request a program change in the host. A function of this type will be 
+    provided to the GUI by the host in the instantiate() function. */
+typedef void (*LV2UI_Program_Function)(LV2UI_Controller controller,
+				       unsigned char    program);
+
+/** */
 typedef struct _LV2UI_Descriptor {
   
   /** The URI for this GUI (not for the plugin it controls). */
@@ -152,6 +167,8 @@ typedef struct _LV2UI_Descriptor {
                               const char*                     plugin_uri,
                               const char*                     bundle_path,
 			      LV2UI_Write_Function            write_function,
+			      LV2UI_Command_Function          command_function,
+			      LV2UI_Program_Function          program_function,
                               LV2UI_Controller                controller,
                               GtkWidget**                     widget,
 			      const LV2_Host_Feature**        features);
@@ -205,6 +222,39 @@ typedef struct _LV2UI_Descriptor {
 		     uint32_t       buffer_size,
 		     const void*    buffer);
   
+  /** This function is called when the plugin instance wants to send feedback
+      to the GUI. It may be called in response to a command function call,
+      either before or after the command function has returned (depending on
+      whether the GUI host <-> plugin instance communication is synchronous or
+      asynchronous). */
+  void (*feedback)(LV2UI_Handle       gui, 
+		   uint32_t           argc, 
+		   const char* const* argv);
+  
+  /** This function is called when the host adds a new program to its program
+      list, or changes the name of an old one. It may be set to NULL if the 
+      GUI isn't interested in displaying program information. */
+  void (*program_added)(LV2UI_Handle  gui, 
+			unsigned char number, 
+			const char*  name);
+  
+  /** This function is called when the host removes a program from its program
+      list. It may be set to NULL if the GUI isn't interested in displaying
+      program information. */
+  void (*program_removed)(LV2UI_Handle  gui, 
+			  unsigned char number);
+  
+  /** This function is called when the host clears its program list. It may be
+      set to NULL if the GUI isn't interested in displaying program 
+      information. */
+  void (*programs_cleared)(LV2UI_Handle gui);
+  
+  /** This function is called when the host changes the current program. It may
+      be set to NULL if the GUI isn't interested in displaying program 
+      information. */
+  void (*current_program_changed)(LV2UI_Handle  gui, 
+				  unsigned char number);
+
   /** Returns a data structure associated with an extension URI, for example
       a struct containing additional function pointers. Avoid returning
       function pointers directly since standard C++ has no valid way of

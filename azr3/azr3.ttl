@@ -32,7 +32,7 @@ plug:speakers pg:subgroupOf plug:fx.
   doap:name "AZR3";
   doap:license <http://usefulinc.com/doap/licenses/gpl>;
   gg:gui <http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0/gui>;
-  #ll:defaultPresets <presets.ttl>;
+  ll:defaultPresets <presets.ttl>;
   ll:svgIcon <icon.svg>;
       
   lv2:port [
