@@ -142,7 +142,7 @@ ALL_DATA += $$($(2)_FULLDATA)
 LV2_BUNDLES_REAL += $$($(2)_BLDPRF)/$(1)
 LV2_BUNDLES_NOINST += $$(if $$($(2)_NOINST),$(2),)
 $(2)_INSTDIR = $$(if $$($(2)_INSTALLDIR),$$($(2)_INSTALLDIR),$(lv2plugindir))
-EXTRA_DIST += $$(if $$($(2)_MANIFEST),$$($(2)_SRCPRF)/$$($(2)_MANIFEST),)
+EXTRA_DIST += $$(if $$($(2)_MANIFEST),$$($(2)_SRCPRF)/$$($(2)_MANIFEST),) $$($(2)_FULLPEGFILES)
 
 # targets
 $$($(2)_BLDPRF)/$(1): $$($(2)_FULLDATA) $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_PROGRAMS)) $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_MODULES)) $$(if $$($(2)_MANIFEST),$$($(2)_SRCPRF)/$$($(2)_MANIFEST),)
@@ -345,7 +345,7 @@ install: install-libraries install-modules install-programs install-lv2-plugins 
 # DISTRIBUTION
 THIS_FILE = $(patsubst ./%,%,$(firstword $(filter %/Makefile.template,$(patsubst %,./%,$(MAKEFILE_LIST)))))
 CONFIGURE_SCRIPT = $(if $(__path_to_configure),$(__path_to_configure),configure)
-ALL_DIST_FILES = $(ALL_SOURCES) $(DATA) $(DOCS) $(EXTRA_DIST) $(ALL_DATA)
+ALL_DIST_FILES = $(sort $(ALL_SOURCES) $(DATA) $(DOCS) $(EXTRA_DIST) $(ALL_DATA))
 dist: 
 	rm -rf $(PACKAGE_NAME)-$(PACKAGE_VERSION)
 	rm -rf $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.bz2

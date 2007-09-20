@@ -139,8 +139,21 @@ typedef void (*LV2UI_Command_Function)(LV2UI_Controller   controller,
     callback will be called, either before or after this function returns
     depending on whether the GUI host <-> plugin instance communication is
     synchronous or asynchronous. */
-typedef void (*LV2UI_Program_Function)(LV2UI_Controller controller,
-				       unsigned char    program);
+typedef void (*LV2UI_Program_Change_Function)(LV2UI_Controller controller,
+					      unsigned char    program);
+
+/** This is the type of the host-provided function that the GUI can use to
+    request that the current state of the plugin is saved to a program.
+    A function of this type will be provided to the GUI by the host in the
+    instantiate function. Calling this function does not guarantee that the
+    state will be saved, it is just a request. If the state is saved, the 
+    GUI's program_added() callback will be called, either before or after
+    this function returns depending on whether the GUI host <-> plugin
+    instance communication is synchronous or asynchronous. */
+typedef void (*LV2UI_Program_Save_Function)(LV2UI_Controller controller,
+					    unsigned char    program,
+					    const char*      name);
+
 
 /** */
 typedef struct _LV2UI_Descriptor {
@@ -180,7 +193,8 @@ typedef struct _LV2UI_Descriptor {
                               const char*                     bundle_path,
 			      LV2UI_Write_Function            write_function,
 			      LV2UI_Command_Function          command_function,
-			      LV2UI_Program_Function          program_function,
+			      LV2UI_Program_Change_Function   program_function,
+			      LV2UI_Program_Save_Function     save_function,
                               LV2UI_Controller                controller,
                               GtkWidget**                     widget,
 			      const LV2_Host_Feature**        features);

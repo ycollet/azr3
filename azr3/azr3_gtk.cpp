@@ -51,10 +51,12 @@ public:
   AZR3GUI(const std::string& URI,
 	  const std::string& bundle_path,
 	  LV2UI_Write_Function write_function,
-	  LV2UI_Program_Function program_function,
+	  LV2UI_Program_Change_Function program_function,
+	  LV2UI_Program_Save_Function save_function,
 	  LV2UI_Controller controller)
     : m_write_function(write_function),
       m_program_function(program_function),
+      m_save_function(save_function),
       m_controller(controller),
       showing_fx_controls(true),
       current_program(0),
@@ -570,7 +572,7 @@ protected:
     Label lbl2("Number:");
     Entry ent;
     ent.set_max_length(23);
-    Adjustment adj(0, 0, 31);
+    Adjustment adj(0, 0, 127);
     SpinButton spb(adj);
     spb.set_value(current_program);
     tbl.attach(lbl1, 0, 1, 0, 1);
@@ -579,14 +581,25 @@ protected:
     tbl.attach(spb, 1, 2, 1, 2);
     dlg.get_vbox()->pack_start(tbl);
     dlg.show_all();
-    if (dlg.run() == RESPONSE_OK) {
-      cerr<<"Saving programs is not implemented yet"<<endl;
+    while (dlg.run() == RESPONSE_OK) {
+      if (programs.find((unsigned char)adj.get_value()) != programs.end()) {
+	MessageDialog msg("There is already a program with this number. Are "
+			  "you sure that you want to overwrite it?", false,
+			  MESSAGE_QUESTION, BUTTONS_YES_NO);
+	msg.show_all();
+	if (msg.run() == RESPONSE_NO)
+	  continue;
+      }
+      m_save_function(m_controller, (unsigned char)adj.get_value(), 
+		      ent.get_text().c_str());
+      break;
     }
   }
 
 
   LV2UI_Write_Function m_write_function;
-  LV2UI_Program_Function m_program_function;
+  LV2UI_Program_Change_Function m_program_function;
+  LV2UI_Program_Save_Function m_save_function;
   LV2UI_Controller m_controller;
 
   bool showing_fx_controls;
@@ -619,12 +632,14 @@ namespace {
 			   const char* bundle_path,
 			   LV2UI_Write_Function write_function,
 			   LV2UI_Command_Function command_function,
-			   LV2UI_Program_Function program_function,
+			   LV2UI_Program_Change_Function program_function,
+			   LV2UI_Program_Save_Function save_function,
 			   LV2UI_Controller controller,
 			   GtkWidget** widget,
 			   const LV2_Host_Feature** features) {
     AZR3GUI* gui = new AZR3GUI(plugin_uri, bundle_path, 
-			       write_function, program_function, controller);
+			       write_function, program_function, 
+			       save_function, controller);
     *widget = GTK_WIDGET(gui->gobj());
     return gui;
   }

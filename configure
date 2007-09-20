@@ -38,7 +38,7 @@ done
 echo __path_to_configure = $0 > Makefile.config.tmp
 for arg in "$@"; do
     if [[ $arg =~ --[0-9a-zA-Z_]+=.* ]]; then
-        echo $arg | sed 's/--\([0-9a-zA-Z]\+\)=\(.*\)/\1\ =\ \2/' >> Makefile.config.tmp
+        echo $arg | sed 's/--\([0-9a-zA-Z_]\+\)=\(.*\)/\1\ =\ \2/' >> Makefile.config.tmp
     else
         echo "'$arg' is not a valid parameter to configure!"
         exit
