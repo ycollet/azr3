@@ -223,10 +223,6 @@ public:
   
     pack_start(fbox);
     
-    //signal_control_changed.
-    //  connect(mem_fun(ctrl, &LV2Controller::set_control));
-    //signal_set_program.
-    //  connect(mem_fun(ctrl, &LV2Controller::set_program));
     splitpoint_changed();
     
   }
@@ -477,7 +473,7 @@ protected:
       oss<<setw(2)<<setfill('0')<<iter->first<<' '<<iter->second.substr(0, 23);
       MenuItem* item = manage(new MenuItem(oss.str()));
       item->signal_activate().
-	connect(bind(mem_fun(*this, &AZR3GUI::set_program), iter->first));
+	connect(bind(mem_fun(*this, &AZR3GUI::program_changed), iter->first));
       program_menu->items().push_back(*item);
       item->show();
       item->get_child()->modify_fg(STATE_NORMAL, menu_fg);
