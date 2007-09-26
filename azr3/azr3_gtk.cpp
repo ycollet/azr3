@@ -27,7 +27,7 @@
 
 #include <gtkmm.h>
 
-#include "lv2-gtk2gui.h"
+#include "lv2-gui.h"
 
 #include "panelfx.xpm"
 #include "voice.xpm"
@@ -631,7 +631,7 @@ namespace {
 			   LV2UI_Program_Change_Function program_function,
 			   LV2UI_Program_Save_Function save_function,
 			   LV2UI_Controller controller,
-			   GtkWidget** widget,
+			   void** widget,
 			   const LV2_Host_Feature** features) {
     AZR3GUI* gui = new AZR3GUI(plugin_uri, bundle_path, 
 			       write_function, program_function, 

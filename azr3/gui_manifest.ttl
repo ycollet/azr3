@@ -1,10 +1,11 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.
-@prefix gg: <http://ll-plugins.nongnu.org/lv2/ext/gtk2gui#>.
+@prefix guiext: <http://ll-plugins.nongnu.org/lv2/ext/gui/dev/1#>.
 
 <http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0>
   rdfs:seeAlso <>;
-  gg:gui <http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0/gui>.
+  guiext:gui <http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0/gui>.
 
 <http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0/gui> 
-  gg:binary <azr3_gtk.so>;
-  gg:optionalFeature gg:fixedSize.
+  a guiext:GtkGUI;
+  guiext:binary <azr3_gtk.so>;	
+  guiext:optionalFeature gg:fixedSize.
