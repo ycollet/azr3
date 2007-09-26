@@ -8,4 +8,4 @@
 <http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0/gui> 
   a guiext:GtkGUI;
   guiext:binary <azr3_gtk.so>;	
-  guiext:optionalFeature gg:fixedSize.
+  guiext:optionalFeature guiext:fixedSize.
