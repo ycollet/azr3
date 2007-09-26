@@ -633,6 +633,7 @@ namespace {
 			   LV2UI_Controller controller,
 			   void** widget,
 			   const LV2_Host_Feature** features) {
+    Gtk::Main::init_gtkmm_internals();
     AZR3GUI* gui = new AZR3GUI(plugin_uri, bundle_path, 
 			       write_function, program_function, 
 			       save_function, controller);
