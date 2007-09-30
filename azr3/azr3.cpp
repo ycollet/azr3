@@ -349,9 +349,6 @@ void AZR3::run(uint32_t sampleFrames) {
       unsigned char channel = evt[0] & 0x0F;
       volatile float* tbl;
                         
-      if (channel > 2)
-	channel = 0;
-      
       // do the keyboard split
       if (((evt[0] & 0xF0) == 0x80 || (evt[0] & 0xF0) == 0x90) &&
           splitpoint > 0 && channel == 0 && evt[1] <= splitpoint)
