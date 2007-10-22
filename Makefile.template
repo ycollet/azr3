@@ -32,7 +32,7 @@ define ARCHIVE_template
 # variables
 $(2)_SRCPRF = $$(if $$($(2)_SOURCEDIR),$$($(2)_SOURCEDIR),.)
 $(2)_BLDPRF = $$(if $$($(2)_BUILDDIR),$$($(2)_BUILDDIR),$$($(2)_SRCPRF))
-$(2)_FULLSOURCES = $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_SOURCES))
+$(2)_FULLSOURCES = $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_SOURCES) $$($(2)_HEADERS))
 $(2)_CSOURCES = $$(filter %.c,$$($(2)_FULLSOURCES))
 $(2)_CXXSOURCES = $$(filter %.cpp,$$($(2)_FULLSOURCES))
 $(2)_COBJECTS = $$(subst .c,.o,$$($(2)_CSOURCES))
@@ -43,6 +43,7 @@ ALL_SOURCES += $$($(2)_FULLSOURCES)
 ARCHIVES_REAL += $$($(2)_BLDPRF)/$(1)
 ALL_LIBHEADER_INSTALLS += $$(if $$($(2)_HEADERS),install-$(2)-headers)
 $(2)_INSTDIR = $$(if $$($(2)_INSTALLDIR),$$($(2)_INSTALLDIR),$(libdir))
+ARCHIVES_NOINST += $$(if $$($(2)_INSTALLDIR),,$(1))
 
 # targets
 $$($(2)_COBJECTS): Makefile.config
@@ -84,7 +85,7 @@ define LIBRARY_template
 # variables
 $(2)_SRCPRF = $$(if $$($(2)_SOURCEDIR),$$($(2)_SOURCEDIR),.)
 $(2)_BLDPRF = $$(if $$($(2)_BUILDDIR),$$($(2)_BUILDDIR),$$($(2)_SRCPRF))
-$(2)_FULLSOURCES = $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_SOURCES))
+$(2)_FULLSOURCES = $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_SOURCES) $$($(2)_HEADERS))
 $(2)_CSOURCES = $$(filter %.c,$$($(2)_FULLSOURCES))
 $(2)_CXXSOURCES = $$(filter %.cpp,$$($(2)_FULLSOURCES))
 $(2)_COBJECTS = $$(subst .c,.o,$$($(2)_CSOURCES))
@@ -173,7 +174,7 @@ define PROGRAM_template
 # variables
 $(1)_SRCPRF = $$(if $$($(1)_SOURCEDIR),$$($(1)_SOURCEDIR),.)
 $(1)_BLDPRF = $$(if $$($(1)_BUILDDIR),$$($(1)_BUILDDIR),$$($(1)_SRCPRF))
-$(1)_FULLSOURCES = $$(patsubst %,$$($(1)_SRCPRF)/%,$$($(1)_SOURCES))
+$(1)_FULLSOURCES = $$(patsubst %,$$($(1)_SRCPRF)/%,$$($(1)_SOURCES) $$($(1)_HEADERS))
 $(1)_CSOURCES = $$(filter %.c,$$($(1)_FULLSOURCES))
 $(1)_CXXSOURCES = $$(filter %.cpp,$$($(1)_FULLSOURCES))
 $(1)_COBJECTS = $$(subst .c,.o,$$($(1)_CSOURCES))
@@ -221,7 +222,7 @@ define MODULE_template
 # variables
 $(2)_SRCPRF = $$(if $$($(2)_SOURCEDIR),$$($(2)_SOURCEDIR),.)
 $(2)_BLDPRF = $$(if $$($(2)_BUILDDIR),$$($(2)_BUILDDIR),$$($(2)_SRCPRF))
-$(2)_FULLSOURCES = $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_SOURCES))
+$(2)_FULLSOURCES = $$(patsubst %,$$($(2)_SRCPRF)/%,$$($(2)_SOURCES) $$($(2)_HEADERS))
 $(2)_CSOURCES = $$(filter %.c,$$($(2)_FULLSOURCES))
 $(2)_CXXSOURCES = $$(filter %.cpp,$$($(2)_FULLSOURCES))
 $(2)_COBJECTS = $$(subst .c,.o,$$($(2)_CSOURCES))
@@ -305,6 +306,11 @@ clean:
 
 
 # GLOBAL INSTALL
+ARCHIVES_INST = $(filter-out $(ARCHIVES_NOINST),$(ARCHIVES))
+install-archives: $(patsubst %,install-%,$(subst .,_,$(ARCHIVES_INST)))
+	echo $(ARCHIVES)
+	echo $(ARCHIVES_NOINST)
+
 PROGRAMS_INST = $(filter-out $(PROGRAMS_NOINST),$(PROGRAMS))
 install-programs: $(patsubst %,install-%,$(subst .,_,$(PROGRAMS_INST)))
 
@@ -339,7 +345,7 @@ install-pcfiles: $(PCFILES)
 
 install-datapacks: $(patsubst %,install-%,$(subst .,_,$(DATAPACKS)))
 
-install: install-libraries install-modules install-programs install-lv2-plugins install-data install-docs install-pcfiles install-datapacks
+install: install-archives install-libraries install-modules install-programs install-lv2-plugins install-data install-docs install-pcfiles install-datapacks
 
 
 # DISTRIBUTION
