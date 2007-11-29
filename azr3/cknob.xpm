@@ -1,5 +1,5 @@
 /* XPM */
-static char * cknob[] = {
+static const char * cknob[] = {
 "44 1804 243 2",
 "  	c None",
 ". 	c #5E5D57",

@@ -1,5 +1,5 @@
 /* XPM */
-static char *onoffgreen[] = {
+static const char *onoffgreen[] = {
 /* columns rows colors chars-per-pixel */
 "25 22 16 1",
 "  c #363D3E",

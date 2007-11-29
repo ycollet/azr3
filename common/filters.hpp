@@ -37,139 +37,133 @@
 #endif
 
 
-namespace {
+class filt1 {
+  friend class filt_lp;
+public:
+  inline filt1();
+  inline ~filt1(){};
+  inline float lp();
+  inline float bp();
+  inline float hp();
+  inline void clock(float input);
+  inline void setparam(float cutoff, float q, float samplerate);
+  inline void set_samplerate(float samplerate);
+private:
+  float fs;		// sampling freq
+  float fc;		// cutoff freq
+  float q;		// resonance
+  float m_f,m_q,m_qnrm;
+  float m_h;	// hp out
+  float m_b;	// bp out
+  float m_l;	// lp out
+};
 
-
-  class filt1 {
-    friend class filt_lp;
-  public:
-    filt1();
-    ~filt1(){};
-    float lp();
-    float bp();
-    float hp();
-    void clock(float input);
-    void setparam(float cutoff, float q, float samplerate);
-    void set_samplerate(float samplerate);
-  private:
-    float fs;		// sampling freq
-    float fc;		// cutoff freq
-    float q;		// resonance
-    float m_f,m_q,m_qnrm;
-    float m_h;	// hp out
-    float m_b;	// bp out
-    float m_l;	// lp out
-  };
+class filt_lp : public filt1 {
+public:
+  inline filt_lp();
+  inline float clock(float input);
+};
   
-  class filt_lp : public filt1 {
-  public:
-    filt_lp();
-    float clock(float input);
-  };
+class filt_allpass {
+public:
+  inline filt_allpass() : a1(0.f), zm1(0.f) {
+    a1=zm1=my_delay=y=0;
+  }
   
-  class filt_allpass {
-  public:
-    filt_allpass() : a1(0.f), zm1(0.f) {
-      a1=zm1=my_delay=y=0;
-    }
-    
-    void reset() {
-      a1=zm1=y=0;
-      set_delay(my_delay);
-    }
-    
-    void set_delay(float delay) {
-      my_delay=delay;
-      a1=(1-delay)/(1+delay);
-      a1=DENORMALIZE(a1);
-    }
-    
-    float clock(float input) {
-      if(input<.00000001f && input>-.00000001f)	// prevent Pentium FPU Normalizing
-	return(0);
-      
-      y=-a1*input + zm1;
-      zm1=y*a1+input;
-      return(y);
-    }
-  private:
-    float a1,zm1,my_delay,y;
-  };
+  inline void reset() {
+    a1=zm1=y=0;
+    set_delay(my_delay);
+  }
   
+  inline void set_delay(float delay) {
+    my_delay=delay;
+    a1=(1-delay)/(1+delay);
+    a1=DENORMALIZE(a1);
+  }
   
-  filt1::filt1()
-    : m_l(0),
-      m_h(0),
-      m_b(0),
-      m_f(0),
-      q(0) {
+  inline float clock(float input) {
+    if(input<.00000001f && input>-.00000001f)	// prevent Pentium FPU Normalizing
+      return(0);
     
+    y=-a1*input + zm1;
+    zm1=y*a1+input;
+    return(y);
   }
+private:
+  float a1,zm1,my_delay,y;
+};
 
 
-  void filt1::clock(float input) {
-    float in;
-    in = DENORMALIZE(input);
-    m_l = DENORMALIZE(m_l);
-    m_b = DENORMALIZE(m_b);
-        
-    m_h = in - m_l - q * m_b;
-    m_b += m_f * m_h;
-    m_l += m_f * m_b;
-  }
+filt1::filt1()
+  : m_l(0),
+    m_h(0),
+    m_b(0),
+    m_f(0),
+    q(0) {
+  
+}
 
 
-  float filt1::lp() {
-    return m_l;
-  }
+void filt1::clock(float input) {
+  float in;
+  in = DENORMALIZE(input);
+  m_l = DENORMALIZE(m_l);
+  m_b = DENORMALIZE(m_b);
+  
+  m_h = in - m_l - q * m_b;
+  m_b += m_f * m_h;
+  m_l += m_f * m_b;
+}
 
 
-  float filt1::bp() {
-    return m_b;
-  }
+float filt1::lp() {
+  return m_l;
+}
 
 
-  float filt1::hp() {
-    return m_h;
-  }
+float filt1::bp() {
+  return m_b;
+}
 
 
-  void filt1::set_samplerate(float samplerate) {
-    fs = samplerate;
-    m_l = m_h = m_b = 0;
-    setparam(fc, q, fs);
-  }
+float filt1::hp() {
+  return m_h;
+}
 
 
-  void filt1::setparam(float cutoff, float mq, float samplerate) {
-    fc = cutoff;
-    q = mq;
-    fs = samplerate;
-    m_f = 2.0f * sinf(PI * fc / fs);
-  }
+void filt1::set_samplerate(float samplerate) {
+  fs = samplerate;
+  m_l = m_h = m_b = 0;
+  setparam(fc, q, fs);
+}
 
 
-  filt_lp::filt_lp() 
-    : filt1() {
-
-  }
-
-
-  float filt_lp::clock(float input) {
-    float in;
-    in = DENORMALIZE(input);
-    m_l = DENORMALIZE(m_l);
-    m_b = DENORMALIZE(m_b);
-        
-    m_h = in - m_l - q * m_b;
-    m_b += m_f * m_h;
-    m_l += m_f * m_b;
-
-    return m_l;
-  }
+void filt1::setparam(float cutoff, float mq, float samplerate) {
+  fc = cutoff;
+  q = mq;
+  fs = samplerate;
+  m_f = 2.0f * sinf(PI * fc / fs);
+}
 
 
-}  
+filt_lp::filt_lp() 
+  : filt1() {
+  
+}
+
+
+float filt_lp::clock(float input) {
+  float in;
+  in = DENORMALIZE(input);
+  m_l = DENORMALIZE(m_l);
+  m_b = DENORMALIZE(m_b);
+  
+  m_h = in - m_l - q * m_b;
+  m_b += m_f * m_h;
+  m_l += m_f * m_b;
+  
+  return m_l;
+}
 
 
 #endif

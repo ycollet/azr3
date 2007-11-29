@@ -1,5 +1,5 @@
 /* XPM */
-static char *dbwhite[] = {
+static const char *dbwhite[] = {
 /* columns rows colors chars-per-pixel */
 "22 150 96 2",
 "   c #1C1A14",

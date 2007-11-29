@@ -28,15 +28,13 @@
 #include <sstream>
 
 #include "azr3.hpp"
-#include "lv2-midiport.h"
 #include "voice_classes.h"
 
 
 using namespace std;
 
 
-AZR3::AZR3(double rate, const char* bundle_path, 
-           const LV2_Host_Feature* const*)
+AZR3::AZR3(double rate)
   : n1(NUMOFVOICES),
     samplerate(rate),
     rate_scale(rate / 44100.0),
@@ -200,7 +198,6 @@ void AZR3::run(uint32_t sampleFrames) {
     - speakers
   */
   
-  midi_ptr = p<LV2_MIDI>(63)->data;
   float* out1 = p(64);
   float* out2 = p(65);
   
@@ -1064,6 +1061,7 @@ void AZR3::calc_click() {
 
 unsigned char* AZR3::event_clock(uint32_t offset) {
   
+  /*
   LV2_MIDI* midi = p<LV2_MIDI>(63);
   
   // Are there any events left in the buffer?
@@ -1083,6 +1081,7 @@ unsigned char* AZR3::event_clock(uint32_t offset) {
   midi_ptr += eventsize;
   if ((old_ptr[0] & 0xF0) >= 0x80 && (old_ptr[0] & 0xF0) <= 0xE0)
     return old_ptr;
+  */
   
   return 0;
 }
@@ -1185,61 +1184,3 @@ void* AZR3::worker_function_real() {
 
 
 
-/* The LV2 interface. */
-
-namespace {
-  
-  LV2_Handle instantiate(const LV2_Descriptor* desc,
-			 double frame_rate,
-			 const char* bundle_path,
-			 const LV2_Host_Feature* const* features) {
-    return new AZR3(frame_rate, bundle_path, features);
-  }
-  
-  
-  void connect_port(LV2_Handle instance, uint32_t port, void* buffer) {
-    static_cast<AZR3*>(instance)->connect_port(port, buffer);
-  }
-  
-  
-  void activate(LV2_Handle instance) {
-    static_cast<AZR3*>(instance)->activate();
-  }
-
-  
-  void run(LV2_Handle instance, uint32_t frames) {
-    static_cast<AZR3*>(instance)->run(frames);
-  }
-  
-  
-  void deactivate(LV2_Handle instance) {
-    static_cast<AZR3*>(instance)->deactivate();
-  }
-  
-  
-  void cleanup(LV2_Handle instance) {
-    delete static_cast<AZR3*>(instance);
-  }
-  
-}
-
-
-extern "C" {
-  
-  const LV2_Descriptor *lv2_descriptor(uint32_t index) {
-    static LV2_Descriptor d = {
-      strdup("http://ll-plugins.nongnu.org/lv2/dev/azr3/0.0.0"),
-      &instantiate,
-      &connect_port,
-      &activate,
-      &run,
-      &deactivate,
-      &cleanup,
-      0
-    };
-    if (index == 0)
-      return &d;
-    return 0;
-  }
-
-}

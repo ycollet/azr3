@@ -1,5 +1,5 @@
 /* XPM */
-static char *minioffon[] = {
+static const char *minioffon[] = {
 /* columns rows colors chars-per-pixel */
 "11 24 48 1",
 "  c #343234",

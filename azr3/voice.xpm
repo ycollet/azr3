@@ -1,5 +1,5 @@
 /* XPM */
-static char * voice    [] = {
+static const char* voice[] = {
 "710 101 100 2",
 "  	c #545254",
 ". 	c #6C6C6A",

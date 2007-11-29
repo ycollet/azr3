@@ -26,8 +26,8 @@
 
 #include <pthread.h>
 #include <semaphore.h>
+#include <stdint.h>
 
-#include "lv2.h"
 #include "voice_classes.h"
 #include "Globals.h"
 
@@ -48,7 +48,7 @@ enum {
 class AZR3 {
 public:
  
-  AZR3(double rate, const char* bundle_path, const LV2_Host_Feature* const*);
+  AZR3(double rate);
  
   ~AZR3();
  

@@ -59,7 +59,7 @@ void Drawbar::on_realize() {
   char bits[22 * 150];
   memset(bits, 0, sizeof(char) * pixsize);
   m_bitmap = Bitmap::create(bits, 22, 150);
-  char** xpm = dbblack;
+  const char** xpm = dbblack;
   if (m_type == White)
     xpm = dbwhite;
   else if (m_type == Brown)

@@ -1,5 +1,5 @@
 /* XPM */
-static char * panelfx[] = {
+static const char * panelfx[] = {
 "710 449 357 2",
 "  	c None",
 ". 	c #E4E4E4",

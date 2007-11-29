@@ -71,7 +71,7 @@ void Switch::on_realize() {
   char* bits = new char[pixsize];
   memset(bits, 0, sizeof(char) * pixsize);
   RefPtr<Bitmap> bitmap = Bitmap::create(bits, m_width, m_height * 2);
-  char** xpm = 0;
+  const char** xpm = 0;
   if (m_type == BigRed)
     xpm = vonoff;
   else if (m_type == Green)

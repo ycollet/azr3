@@ -1,5 +1,5 @@
 /* XPM */
-static char *dbbrown[] = {
+static const char *dbbrown[] = {
 /* columns rows colors chars-per-pixel */
 "22 150 104 2",
 "   c #191600",

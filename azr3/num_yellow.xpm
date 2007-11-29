@@ -1,5 +1,5 @@
 /* XPM */
-static char * num_yellow    [] = {
+static const char * num_yellow    [] = {
 "5 84 2 1",
 " 	c None",
 ".	c #FFECC8",
