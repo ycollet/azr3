@@ -1,6 +1,6 @@
 PACKAGE_NAME = azr3-jack
-PACKAGE_VERSION = 0.1.294
-PKG_DEPS = gtkmm-2.4>=2.8.8
+PACKAGE_VERSION = 0.1.295
+PKG_DEPS = gtkmm-2.4>=2.8.8 jack>=0.107.0
 
 
 PROGRAMS = azr3
@@ -19,8 +19,8 @@ azr3_SOURCES = \
 	textbox.hpp textbox.cpp \
 	cknob.xpm minioffon.xpm onoffgreen.xpm panelfx.xpm vonoff.xpm voice.xpm num_yellow.xpm dbblack.xpm dbbrown.xpm dbwhite.xpm
 azr3_SOURCEDIR = azr3
-azr3_CFLAGS = `pkg-config --cflags gtkmm-2.4` -I. -Icommon
-azr3_LDFLAGS = `pkg-config --libs gtkmm-2.4` 
+azr3_CFLAGS = `pkg-config --cflags gtkmm-2.4 jack` -Icommon
+azr3_LDFLAGS = `pkg-config --libs gtkmm-2.4 jack` 
 
 
 # The shared headers need to go in the distribution too

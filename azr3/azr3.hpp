@@ -199,6 +199,8 @@ protected:
   sem_t m_qsem;
   
   pthread_t m_worker;
+  
+  unsigned int event_index;
 };
 
 

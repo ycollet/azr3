@@ -32,6 +32,7 @@ plug:speakers pg:subgroupOf plug:fx.
   doap:license <http://usefulinc.com/doap/licenses/gpl>;
   ll:defaultPresets <presets.ttl>;
   ll:svgIcon <icon.svg>;
+  ll:pegName "a";
       
   lv2:port [
     a lv2:InputPort, lv2:ControlPort;

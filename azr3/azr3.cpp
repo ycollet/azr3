@@ -22,10 +22,11 @@
 ****************************************************************************/
 
 #include <cmath>
-//#define _GNU_SOURCE
 #include <cstring>
 #include <iostream>
 #include <sstream>
+
+#include <jack/midiport.h>
 
 #include "azr3.hpp"
 #include "voice_classes.h"
@@ -331,6 +332,7 @@ void AZR3::run(uint32_t sampleFrames) {
   // keyboard split
   splitpoint = (long)(*p(n_splitpoint) * 128);
   
+  event_index = 0;
   int     x;
   float last_out1, last_out2;
   unsigned char* evt;
@@ -1061,27 +1063,20 @@ void AZR3::calc_click() {
 
 unsigned char* AZR3::event_clock(uint32_t offset) {
   
-  /*
-  LV2_MIDI* midi = p<LV2_MIDI>(63);
-  
-  // Are there any events left in the buffer?
-  if (midi_ptr - midi->data >= midi->size)
-    return 0;
-  
-  // Is next event occuring on this frame?
-  double& timestamp = *reinterpret_cast<double*>(midi_ptr);
-  if (timestamp > offset)
-    return 0;
-  
-  // It is! Return it if it is a channel event!
-  midi_ptr += sizeof(double);
-  size_t& eventsize = *reinterpret_cast<size_t*>(midi_ptr);
-  midi_ptr += sizeof(size_t);
-  unsigned char* old_ptr = midi_ptr;
-  midi_ptr += eventsize;
-  if ((old_ptr[0] & 0xF0) >= 0x80 && (old_ptr[0] & 0xF0) <= 0xE0)
-    return old_ptr;
-  */
+  void* midi = p<void>(63);
+  jack_midi_event_t event;
+  jack_nframes_t event_count = jack_midi_get_event_count(midi);
+  if (event_index < event_count) {
+    jack_midi_event_get(&event, midi, event_index);
+    if (event.time <= offset && event.size >= 3) {
+      unsigned char status = event.buffer[0] & 0xF0;
+      if (status >= 0x80 && status <= 0xE0) {
+	++event_index;
+	cout<<hex<<int(status)<<endl;
+	return event.buffer;
+      }
+    }
+  }
   
   return 0;
 }
