@@ -75,9 +75,6 @@ protected:
   /** Compute click coefficients. */
   void calc_click();
  
-  /** Get an event from the MIDI port. */
-  unsigned char* event_clock(uint32_t offset);
- 
   /** This is a wrapper for worker_function_real(), needed because the
       pthreads API does not know about classes and member functions. The
       parameter should be a pointer to an AZR3 object. */
@@ -200,7 +197,6 @@ protected:
   
   pthread_t m_worker;
   
-  unsigned int event_index;
 };
 
 

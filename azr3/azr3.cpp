@@ -332,34 +332,373 @@ void AZR3::run(uint32_t sampleFrames) {
   // keyboard split
   splitpoint = (long)(*p(n_splitpoint) * 128);
   
-  event_index = 0;
+  jack_nframes_t event_index = 0;
+  void* midi = p<void>(63);
+  jack_nframes_t event_count = jack_midi_get_event_count(midi);
   int     x;
   float last_out1, last_out2;
   unsigned char* evt;
-  for (uint32_t pframe = 0; pframe < sampleFrames; ++pframe) {
-    
-    // we need this variable further down
-    ++samplecount;
-    if(samplecount > 10000)
-      samplecount = 0;
-                
-    // read events from our own event queue
-    while((evt = this->event_clock(pframe)) != NULL) {
-      unsigned char channel = evt[0] & 0x0F;
-      volatile float* tbl;
-                        
-      // do the keyboard split
-      if (((evt[0] & 0xF0) == 0x80 || (evt[0] & 0xF0) == 0x90) &&
-          splitpoint > 0 && channel == 0 && evt[1] <= splitpoint)
-        channel = 2;
+  jack_midi_event_t event;
+  uint32_t pframe = 0;
 
-      switch (evt[0] & 0xF0)
-	{
+  while (event_index <= event_count) {
+    
+    if (event_index == event_count)
+      event.time = sampleFrames;
+    else
+      jack_midi_event_get(&event, midi, event_index);
+    ++event_index;
+      
+    for ( ; pframe < event.time; ++pframe) {
+      
+      // we need this variable further down
+      ++samplecount;
+      if(samplecount > 10000)
+	samplecount = 0;
+      
+      // if n_pedalspeed is on, use the hold pedal for speed
+      if (*p(n_pedalspeed) >= 0.5)
+	fastmode = pedal;
+      
+      float* p_mono = n1.clock();
+      float mono1 = p_mono[0];
+      float mono2 = p_mono[1];
+      float mono = p_mono[2];
+      
+      // smoothing of vibrato switch 1
+      if (vibchanged1 && samplecount % 10 == 0) {
+	if(*p(n_1_vibrato) == 1) {
+	  vmix1 += 0.01f;
+	  if (vmix1 >= *p(n_1_vmix))
+	    vibchanged1 = false;
+	}
+	else {
+	  vmix1 -= 0.01f;
+	  if (vmix1 <= 0)
+	    vibchanged1 = false;
+	}
+      }
+      
+      // smoothing of vibrato switch 2
+      if(vibchanged2 && samplecount % 10 == 0) {
+	if(*p(n_2_vibrato) == 1) {
+	  vmix2 += 0.01f;
+	  if (vmix2 >= *p(n_2_vmix))
+	    vibchanged2 = false;
+	}
+	else {
+	  vmix2 -= 0.01f;
+	  if (vmix2 <= 0)
+	    vibchanged2 = false;
+	}
+      }
+      
+      // smoothing of OD switch
+      if(odchanged && samplecount % 10 == 0) {
+	if(*p(n_mrvalve) > 0.5) {
+	  odmix += 0.05f;
+	  if (odmix >= *p(n_mix))
+	    odchanged = false;
+	}
+	else {
+	  odmix -= 0.05f;
+	  if (odmix <= 0)
+	    odchanged = false;
+	}
+	n_odmix = 1 - odmix;
+	n2_odmix = 2 - odmix;
+	odmix75 = 0.75f * odmix;
+	n25_odmix = n_odmix * 0.25f;
+      }
+      
+      // Vibrato LFO
+      bool lfo_calced = false;
+      
+      // Vibrato 1
+      if(*p(n_1_vibrato) == 1 || vibchanged1) {
+	if(samplecount % 5 == 0) {
+	  viblfo = vlfo.clock();
+	  lfo_calced = true;
+	  vdelay1.set_delay(viblfo * 2 * *p(n_1_vstrength));
+	}
+	mono1 = (1 - vmix1) * mono1 + vmix1 * vdelay1.clock(mono1);
+      }
+      
+      // Vibrato 2
+      if(*p(n_2_vibrato) == 1 || vibchanged2) {
+	if(samplecount % 5 == 0) {
+	  if(!lfo_calced)
+	    viblfo = vlfo.clock();
+	  vdelay2.set_delay(viblfo * 2 * *p(n_2_vstrength));
+	}
+	mono2 = (1 - vmix2) * mono2 + vmix2 * vdelay2.clock(mono2);
+      }
+      
+      mono += mono1 + mono2;
+      mono *= 1.4f;
+      
+      // Mr. Valve
+      /*
+	Completely rebuilt.
+	Multiband distortion:
+	The first atan() waveshaper is applied to a lower band. The second
+	one is applied to the whole spectrum as a clipping function (combined
+	with an fabs() branch).
+	The "warmth" filter is now applied _after_ distortion to flatten
+	down distortion overtones. It's only applied with activated distortion
+	effect, so we can switch warmth off and on without adding another 
+	parameter.
+      */
+      if (*p(n_mrvalve) > 0.5 || odchanged) {
+	if (do_dist) {
+	  body_filt.clock(mono);
+	  postbody_filt.clock(atanf(body_filt.lp() * dist8) * 6);
+	  fuzz = atanf(mono * dist4) * 0.25f + 
+	    postbody_filt.bp() + postbody_filt.hp();
+	  
+	  if (_fabsf(mono) > *p(n_set))
+	    fuzz = atanf(fuzz * 10);
+	  fuzz_filt.clock(fuzz);
+	  mono = ((fuzz_filt.lp() * odmix * sin_dist + mono * (n2_odmix)) * 
+		  sin_dist) * i_dist;
+	}
+	else {
+	  fuzz_filt.clock(mono);
+	  mono = fuzz_filt.lp() * odmix75 + mono * n25_odmix * i_dist;
+	}
+	mono = warmth.clock(mono);
+      }
+      
+      // Speakers
+      /*
+	I started the rotating speaker sim from scratch with just
+	a few sketches about how reality looks like:
+	Two horn speakers, rotating in a circle. Combined panning
+	between low and mid filtered sound and the volume. Add the
+	doppler effect. Let the sound of one speaker get reflected
+	by a wall and mixed with the other speakers' output. That's
+	all not too hard to calculate and to implement in C++, and
+	the results were already quite realistic. However, to get
+	more density and the explicit "muddy" touch I added some
+	phase shifting gags and some unexpected additions with
+	the other channels' data. The result did take many nights
+	of twiggling wih parameters. There are still some commented
+	alternatives; feel free to experiment with the emulation.
+	Never forget to mono check since there are so many phase
+	effects in here you might end up in the void.
+	I'm looking forward to the results...
+      */
+      
+      /*
+	Update:
+	I added some phase shifting using allpass filters.
+	This should make it sound more realistic.
+      */
+      
+      if (*p(n_speakers) > 0.5) {
+	if (samplecount % 100 == 0) {
+	  if (fastmode) {
+	    if (lspeed < lfast)
+	      lspeed += lbelt_up;
+	    if (lspeed > lfast)
+	      lspeed = lfast;
+	    
+	    if (uspeed < ufast)
+	      uspeed += ubelt_up;
+	    if (uspeed > ufast)
+	      uspeed = ufast;
+	  }
+	  else {
+	    if (lspeed > lslow)
+	      lspeed -= lbelt_down;
+	    if (lspeed < lslow)
+	      lspeed = lslow;
+	    if (uspeed > uslow)
+	      uspeed -= ubelt_down;
+	    if (uspeed < uslow)
+	      uspeed = uslow;
+	  }
+	  
+	  //recalculate mic positions when "spread" has changed
+	  if(!lfos_ok) {
+	    float s = (*p(n_spread) + 0.5f) * 0.8f;
+	    spread = (s) * 2 + 1;
+	    spread2 = (1 - spread) / 2;
+	    // this crackles - use offset_phase instead
+	    //lfo1.set_phase(0);
+	    //lfo2.set_phase(s / 2);
+	    //lfo3.set_phase(0);
+	    //lfo4.set_phase(s / 2);
+	    lfo2.offset_phase(lfo1, s / 2);
+	    lfo4.offset_phase(lfo3, s / 2);
+	    
+	    cross1 = 1.5f - 1.2f * s;
+	    // early reflections depend upon mic position.
+	    // we want less e/r if mics are positioned on
+	    // opposite side of speakers.
+	    // when positioned right in front of them e/r
+	    // brings back some livelyness.
+	    //
+	    // so "spread" does the following to the mic positions:
+	    // minimum: mics are almost at same position (mono) but
+	    // further away from cabinet.
+	    // maximum: mics are on opposite sides of cabinet and very
+	    // close to speakers.
+	    // medium: mics form a 90° angle, heading towards cabinet at
+	    // medium distance.
+	    er_feedback = 0.03f * cross1;
+	    lfos_ok = true;
+	  }
+	  
+	  if (lspeed != lfo3.get_rate()) {
+	    lfo3.set_rate(lspeed * 5, 1);
+	    lfo4.set_rate(lspeed * 5, 1);
+	  }
+	  
+	  if (uspeed != lfo1.get_rate()) {
+	    lfo1.set_rate(uspeed * 5, 1);
+	    lfo2.set_rate(uspeed * 5, 1);
+	  } 
+	}
+	
+	// split signal into upper and lower cabinet speakers
+	split.clock(mono);
+	float lower = split.lp() * 5;
+	float upper = split.hp();
+	
+	// upper speaker is kind of a nasty horn - this makes up
+	// a major part of the typical sound!
+	horn_filt.clock(upper);
+	upper = upper * 0.5f + horn_filt.lp() * 2.3f;
+	damp.clock(upper);
+	float upper_damp = damp.lp();
+	
+	// do lfo stuff
+	if(samplecount % 5 == 0) {
+	  lfo_d_out = lfo1.clock();
+	  lfo_d_nout = 1 - lfo_d_out;
+	  
+	  delay1.set_delay(10 + lfo_d_out * 0.8f);
+	  delay2.set_delay(17 + lfo_d_nout * 0.8f);
+	  
+	  lfo_d_nout = lfo2.clock();
+	  
+	  lfo_out = lfo_d_out * spread + spread2;
+	  lfo_nout = lfo_d_nout * spread + spread2;
+	  
+	  // phase shifting lines
+	  // (do you remember? A light bulb and some LDRs...
+	  //  DSPing is so much nicer than soldering...)
+	  float lfo_phaser1 = (1 - cosf(lfo_d_out * 1.8f) + 1) * 0.054f;
+	  float lfo_phaser2 = (1 - cosf(lfo_d_nout * 1.8f) + 1) * .054f;
+	  for(x = 0; x < 4; x++) {
+	    allpass_r[x].set_delay(lfo_phaser1);
+	    allpass_l[x].set_delay(lfo_phaser2);
+	  }
+	  
+	  if(lslow > 0) {
+	    llfo_d_out = lfo3.clock();
+	    llfo_d_nout = 1 - llfo_d_out;
+	  }
+	  
+	  // additional delay lines in complex mode
+	  if(*p(n_complex) > 0.5f) {
+	    delay4.set_delay(llfo_d_out + 15);
+	    delay3.set_delay(llfo_d_nout + 25);
+	  }
+	  
+	  llfo_d_nout = lfo4.clock();
+	  llfo_out = llfo_d_out * spread + spread2;
+	  llfo_nout = llfo_d_nout * spread + spread2;
+	}
+	
+	float lright, lleft;
+	if(lslow > 0) {
+	  lright = (1 + 0.6f * llfo_out) * lower;
+	  lleft = (1 + 0.6f * llfo_nout) * lower;
+	}
+	else {
+	  lright = lleft = lower;
+	}
+	
+	// emulate vertical horn characteristics
+	// (sound is dampened when listened from aside)
+	float right = (3 + lfo_nout * 2.5f) * upper + 1.5f * upper_damp;
+	float left = (3 + lfo_out * 2.5f) * upper + 1.5f * upper_damp;
+	
+	//phaser...
+	last_r = allpass_r[0].clock(
+	         allpass_r[1].clock(
+	         allpass_r[2].clock(
+	         allpass_r[3].clock(upper + last_r * 0.33f))));
+	last_l = allpass_l[0].clock(
+	         allpass_l[1].clock(
+	         allpass_l[2].clock(
+	         allpass_l[3].clock(upper + last_l * 0.33f))));
+
+	right += last_r;
+	left += last_l;
+	
+	// rotating speakers can only develop in a live room -
+	// wouldn't work without some early reflections.
+	er_r = wand_r.clock(right + lright - (left *0.3f) - er_l * er_feedback);
+	er_r = DENORMALIZE(er_r);
+	er_l = wand_l.clock(left + lleft - (right * .3f) - 
+			    er_r_before * er_feedback);
+	er_l = DENORMALIZE(er_l);
+	er_r_before = er_r;
+	
+	
+	// We use two additional delay lines in "complex" mode
+	if (*p(n_complex) > 0.5f) {
+	  right = right * 0.3f + 1.5f * er_r + 
+	    delay1.clock(right) + delay3.clock(er_r);
+	  left = left * 0.3f + 1.5f * er_l + 
+	    delay2.clock(left) + delay4.clock(er_l);
+	}
+	else {
+	  right = right * 0.3f + 1.5f * er_r + delay1.clock(right) + lright;
+	  left = left * 0.3f + 1.5f * er_l + delay2.clock(left) + lleft;
+	}
+	
+	right *= 0.033f;
+	left *= 0.033f;
+	
+	// spread crossover (emulates mic positions)
+	last_out1 = (left + cross1 * right) * *p(n_master);
+	last_out2 = (right + cross1 * left) * *p(n_master);
+      }
+      else {
+	last_out1 = last_out2 = mono * *p(n_master);
+      }
+      //if(mute) {
+      //  last_out1 = 0;
+      //  last_out2 = 0;
+      //}
+      
+      (*out1++) = last_out1;
+      (*out2++) = last_out2;
+    }
+    
+    // Handle MIDI event
+    if (event.time < sampleFrames) {
+      evt = event.buffer;
+      unsigned char status = evt[0] & 0xF0;
+      if (event.size >= 3 && status >= 0x80 && status <= 0xE0) {
+	unsigned char channel = evt[0] & 0x0F;
+	volatile float* tbl;
+	
+	// do the keyboard split
+	if ((status == 0x80 || status == 0x90) &&
+	    splitpoint > 0 && channel == 0 && evt[1] <= splitpoint)
+	  channel = 2;
+	
+	switch (status) {
 	case evt_noteon: {
 	  unsigned char note = evt[1];
 	  bool percenable = false;
 	  float sustain = *p(n_sustain) + .0001f;
-                                        
+	  
 	  // here we choose the correct wavetable according to the played note
 #define foldstart 80
 	  if (note > foldstart + 12 + 12)
@@ -385,7 +724,7 @@ void AZR3::run(uint32_t sampleFrames) {
 			     WAVETABLESIZE];
 	  else
 	    tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL];
-        
+	  
 	  if (channel == 0) {
 	    if (*p(n_1_perc) > 0)
 	      percenable = true;
@@ -404,23 +743,23 @@ void AZR3::run(uint32_t sampleFrames) {
 	    if (*p(n_3_sustain) < 0.5f)
 	      sustain = 0;
 	  }
-                                        
+	  
 	  n1.note_on(note, evt[2], tbl, WAVETABLESIZE, 
 		     channel, percenable, click[channel], sustain);
-                                
+	  
 	  break;
 	}
-        
+	  
 	case evt_noteoff:
 	  n1.note_off(evt[1], channel);
 	  break;
-        
+	  
 	case 0xB0:
-        
+	  
 	  // all notes off
 	  if (evt[1] >= 0x78 && evt[1] <= 0x7F)
 	    n1.all_notes_off();
-        
+	  
 	  // hold pedal
 	  else if (evt[1] == 0x40) {
 	    pedal = evt[2] >= 64;
@@ -428,7 +767,7 @@ void AZR3::run(uint32_t sampleFrames) {
 	      n1.set_pedal(evt[2], channel);
 	  }
 	  break;
-        
+	  
 	case evt_pitch: {
 	  float bender = *p(n_bender);
 	  float pitch = (float)(evt[2] * 128 + evt[1]);
@@ -446,332 +785,12 @@ void AZR3::run(uint32_t sampleFrames) {
 	  n1.set_pitch(pitch, channel);
 	  break;
 	}
-        
+	  
 	}
-    }
-    
-    // if n_pedalspeed is on, use the hold pedal for speed
-    if (*p(n_pedalspeed) >= 0.5)
-      fastmode = pedal;
-    
-    float* p_mono = n1.clock();
-    float mono1 = p_mono[0];
-    float mono2 = p_mono[1];
-    float mono = p_mono[2];
-    
-    // smoothing of vibrato switch 1
-    if (vibchanged1 && samplecount % 10 == 0) {
-      if(*p(n_1_vibrato) == 1) {
-	vmix1 += 0.01f;
-	if (vmix1 >= *p(n_1_vmix))
-	  vibchanged1 = false;
-      }
-      else {
-	vmix1 -= 0.01f;
-	if (vmix1 <= 0)
-	  vibchanged1 = false;
       }
     }
-                
-    // smoothing of vibrato switch 2
-    if(vibchanged2 && samplecount % 10 == 0) {
-      if(*p(n_2_vibrato) == 1) {
-	vmix2 += 0.01f;
-	if (vmix2 >= *p(n_2_vmix))
-	  vibchanged2 = false;
-      }
-      else {
-	vmix2 -= 0.01f;
-	if (vmix2 <= 0)
-	  vibchanged2 = false;
-      }
-    }
-                
-    // smoothing of OD switch
-    if(odchanged && samplecount % 10 == 0) {
-      if(*p(n_mrvalve) > 0.5) {
-	odmix += 0.05f;
-	if (odmix >= *p(n_mix))
-	  odchanged = false;
-      }
-      else {
-	odmix -= 0.05f;
-	if (odmix <= 0)
-	  odchanged = false;
-      }
-      n_odmix = 1 - odmix;
-      n2_odmix = 2 - odmix;
-      odmix75 = 0.75f * odmix;
-      n25_odmix = n_odmix * 0.25f;
-    }
-                
-    // Vibrato LFO
-    bool lfo_calced = false;
-                
-    // Vibrato 1
-    if(*p(n_1_vibrato) == 1 || vibchanged1) {
-      if(samplecount % 5 == 0) {
-	viblfo = vlfo.clock();
-	lfo_calced = true;
-	vdelay1.set_delay(viblfo * 2 * *p(n_1_vstrength));
-      }
-      mono1 = (1 - vmix1) * mono1 + vmix1 * vdelay1.clock(mono1);
-    }
-                
-    // Vibrato 2
-    if(*p(n_2_vibrato) == 1 || vibchanged2) {
-      if(samplecount % 5 == 0) {
-	if(!lfo_calced)
-	  viblfo = vlfo.clock();
-	vdelay2.set_delay(viblfo * 2 * *p(n_2_vstrength));
-      }
-      mono2 = (1 - vmix2) * mono2 + vmix2 * vdelay2.clock(mono2);
-    }
-    
-    mono += mono1 + mono2;
-    mono *= 1.4f;
 
-    // Mr. Valve
-    /*
-      Completely rebuilt.
-      Multiband distortion:
-      The first atan() waveshaper is applied to a lower band. The second
-      one is applied to the whole spectrum as a clipping function (combined
-      with an fabs() branch).
-      The "warmth" filter is now applied _after_ distortion to flatten
-      down distortion overtones. It's only applied with activated distortion
-      effect, so we can switch warmth off and on without adding another 
-      parameter.
-    */
-    if (*p(n_mrvalve) > 0.5 || odchanged) {
-      if (do_dist) {
-	body_filt.clock(mono);
-	postbody_filt.clock(atanf(body_filt.lp() * dist8) * 6);
-	fuzz = atanf(mono * dist4) * 0.25f + 
-          postbody_filt.bp() + postbody_filt.hp();
-        
-	if (_fabsf(mono) > *p(n_set))
-	  fuzz = atanf(fuzz * 10);
-	fuzz_filt.clock(fuzz);
-	mono = ((fuzz_filt.lp() * odmix * sin_dist + mono * (n2_odmix)) * 
-                sin_dist) * i_dist;
-      }
-      else {
-	fuzz_filt.clock(mono);
-	mono = fuzz_filt.lp() * odmix75 + mono * n25_odmix * i_dist;
-      }
-      mono = warmth.clock(mono);
-    }
-                
-    // Speakers
-    /*
-      I started the rotating speaker sim from scratch with just
-      a few sketches about how reality looks like:
-      Two horn speakers, rotating in a circle. Combined panning
-      between low and mid filtered sound and the volume. Add the
-      doppler effect. Let the sound of one speaker get reflected
-      by a wall and mixed with the other speakers' output. That's
-      all not too hard to calculate and to implement in C++, and
-      the results were already quite realistic. However, to get
-      more density and the explicit "muddy" touch I added some
-      phase shifting gags and some unexpected additions with
-      the other channels' data. The result did take many nights
-      of twiggling wih parameters. There are still some commented
-      alternatives; feel free to experiment with the emulation.
-      Never forget to mono check since there are so many phase
-      effects in here you might end up in the void.
-      I'm looking forward to the results...
-    */
-                
-    /*
-      Update:
-      I added some phase shifting using allpass filters.
-      This should make it sound more realistic.
-    */
-                
-    if (*p(n_speakers) > 0.5) {
-      if (samplecount % 100 == 0) {
-        if (fastmode) {
-	  if (lspeed < lfast)
-	    lspeed += lbelt_up;
-	  if (lspeed > lfast)
-	    lspeed = lfast;
-                                        
-	  if (uspeed < ufast)
-	    uspeed += ubelt_up;
-	  if (uspeed > ufast)
-	    uspeed = ufast;
-	}
-	else {
-	  if (lspeed > lslow)
-	    lspeed -= lbelt_down;
-	  if (lspeed < lslow)
-	    lspeed = lslow;
-	  if (uspeed > uslow)
-	    uspeed -= ubelt_down;
-	  if (uspeed < uslow)
-	    uspeed = uslow;
-	}
 
-	//recalculate mic positions when "spread" has changed
-	if(!lfos_ok) {
-	  float s = (*p(n_spread) + 0.5f) * 0.8f;
-	  spread = (s) * 2 + 1;
-	  spread2 = (1 - spread) / 2;
-          // this crackles - use offset_phase instead
-	  //lfo1.set_phase(0);
-	  //lfo2.set_phase(s / 2);
-	  //lfo3.set_phase(0);
-	  //lfo4.set_phase(s / 2);
-          lfo2.offset_phase(lfo1, s / 2);
-          lfo4.offset_phase(lfo3, s / 2);
-          
-	  cross1 = 1.5f - 1.2f * s;
-	  // early reflections depend upon mic position.
-	  // we want less e/r if mics are positioned on
-	  // opposite side of speakers.
-	  // when positioned right in front of them e/r
-	  // brings back some livelyness.
-	  //
-	  // so "spread" does the following to the mic positions:
-	  // minimum: mics are almost at same position (mono) but
-	  // further away from cabinet.
-	  // maximum: mics are on opposite sides of cabinet and very
-	  // close to speakers.
-	  // medium: mics form a 90° angle, heading towards cabinet at
-	  // medium distance.
-	  er_feedback = 0.03f * cross1;
-	  lfos_ok = true;
-	}
-                                
-	if (lspeed != lfo3.get_rate()) {
-	  lfo3.set_rate(lspeed * 5, 1);
-	  lfo4.set_rate(lspeed * 5, 1);
-	}
-                                
-	if (uspeed != lfo1.get_rate()) {
-	  lfo1.set_rate(uspeed * 5, 1);
-	  lfo2.set_rate(uspeed * 5, 1);
-	} 
-      }
-
-      // split signal into upper and lower cabinet speakers
-      split.clock(mono);
-      float lower = split.lp() * 5;
-      float upper = split.hp();
-                        
-      // upper speaker is kind of a nasty horn - this makes up
-      // a major part of the typical sound!
-      horn_filt.clock(upper);
-      upper = upper * 0.5f + horn_filt.lp() * 2.3f;
-      damp.clock(upper);
-      float upper_damp = damp.lp();
-                        
-      // do lfo stuff
-      if(samplecount % 5 == 0) {
-	lfo_d_out = lfo1.clock();
-	lfo_d_nout = 1 - lfo_d_out;
-                                
-	delay1.set_delay(10 + lfo_d_out * 0.8f);
-	delay2.set_delay(17 + lfo_d_nout * 0.8f);
-                                
-	lfo_d_nout = lfo2.clock();
-                                
-	lfo_out = lfo_d_out * spread + spread2;
-	lfo_nout = lfo_d_nout * spread + spread2;
-
-	// phase shifting lines
-	// (do you remember? A light bulb and some LDRs...
-	//  DSPing is so much nicer than soldering...)
-	float lfo_phaser1 = (1 - cosf(lfo_d_out * 1.8f) + 1) * 0.054f;
-	float lfo_phaser2 = (1 - cosf(lfo_d_nout * 1.8f) + 1) * .054f;
-	for(x = 0; x < 4; x++) {
-	  allpass_r[x].set_delay(lfo_phaser1);
-	  allpass_l[x].set_delay(lfo_phaser2);
-	}
-
-	if(lslow > 0) {
-	  llfo_d_out = lfo3.clock();
-	  llfo_d_nout = 1 - llfo_d_out;
-	}
-                                
-	// additional delay lines in complex mode
-	if(*p(n_complex) > 0.5f) {
-	  delay4.set_delay(llfo_d_out + 15);
-	  delay3.set_delay(llfo_d_nout + 25);
-	}
-                                
-	llfo_d_nout = lfo4.clock();
-	llfo_out = llfo_d_out * spread + spread2;
-	llfo_nout = llfo_d_nout * spread + spread2;
-      }
-                        
-      float lright, lleft;
-      if(lslow > 0) {
-	lright = (1 + 0.6f * llfo_out) * lower;
-	lleft = (1 + 0.6f * llfo_nout) * lower;
-      }
-      else {
-	lright = lleft = lower;
-      }
-                        
-      // emulate vertical horn characteristics
-      // (sound is dampened when listened from aside)
-      float right = (3 + lfo_nout * 2.5f) * upper + 1.5f * upper_damp;
-      float left = (3 + lfo_out * 2.5f) * upper + 1.5f * upper_damp;
-
-      //phaser...
-      last_r = allpass_r[0].clock(
-	       allpass_r[1].clock(
-	       allpass_r[2].clock(
-	       allpass_r[3].clock(upper + last_r * 0.33f))));
-      last_l = allpass_l[0].clock(
-	       allpass_l[1].clock(
-	       allpass_l[2].clock(
-	       allpass_l[3].clock(upper + last_l * 0.33f))));
-
-      right += last_r;
-      left += last_l;
-                        
-      // rotating speakers can only develop in a live room -
-      // wouldn't work without some early reflections.
-      er_r = wand_r.clock(right + lright - (left * 0.3f) - er_l * er_feedback);
-      er_r = DENORMALIZE(er_r);
-      er_l = wand_l.clock(left + lleft - (right * .3f) - 
-                          er_r_before * er_feedback);
-      er_l = DENORMALIZE(er_l);
-      er_r_before = er_r;
-                        
-
-      // We use two additional delay lines in "complex" mode
-      if (*p(n_complex) > 0.5f) {
-	right = right * 0.3f + 1.5f * er_r + 
-          delay1.clock(right) + delay3.clock(er_r);
-	left = left * 0.3f + 1.5f * er_l + 
-          delay2.clock(left) + delay4.clock(er_l);
-      }
-      else {
-	right = right * 0.3f + 1.5f * er_r + delay1.clock(right) + lright;
-	left = left * 0.3f + 1.5f * er_l + delay2.clock(left) + lleft;
-      }
-                        
-      right *= 0.033f;
-      left *= 0.033f;
-                        
-      // spread crossover (emulates mic positions)
-      last_out1 = (left + cross1 * right) * *p(n_master);
-      last_out2 = (right + cross1 * left) * *p(n_master);
-    }
-    else {
-      last_out1 = last_out2 = mono * *p(n_master);
-    }
-    //if(mute) {
-    //  last_out1 = 0;
-    //  last_out2 = 0;
-    //}
-    
-    (*out1++) = last_out1;
-    (*out2++) = last_out2;
   }
   
   pthread_mutex_unlock(&m_notemaster_lock);
@@ -1058,26 +1077,6 @@ void AZR3::calc_click() {
   click[2] = *p(n_click) *
     (*p(n_3_db1) + *p(n_3_db2) + *p(n_3_db3) + *p(n_3_db4) + 
      *p(n_1_db5)) / 22;
-}
-
-
-unsigned char* AZR3::event_clock(uint32_t offset) {
-  
-  void* midi = p<void>(63);
-  jack_midi_event_t event;
-  jack_nframes_t event_count = jack_midi_get_event_count(midi);
-  if (event_index < event_count) {
-    jack_midi_event_get(&event, midi, event_index);
-    if (event.time <= offset && event.size >= 3) {
-      unsigned char status = event.buffer[0] & 0xF0;
-      if (status >= 0x80 && status <= 0xE0) {
-	++event_index;
-	return event.buffer;
-      }
-    }
-  }
-  
-  return 0;
 }
 
 
