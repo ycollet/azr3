@@ -120,6 +120,7 @@ int main(int argc, char** argv) {
   for (uint32_t i = 0; i < 63; ++i)
     gui.set_control(i, s.gui_controls[i]);
   win.set_title("AZR-3");
+  win.set_resizable(false);
   win.add(gui);
   win.show_all();
   

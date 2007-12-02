@@ -686,110 +686,112 @@ void AZR3::run(uint32_t sampleFrames) {
       unsigned char status = evt[0] & 0xF0;
       if (event.size >= 3 && status >= 0x80 && status <= 0xE0) {
 	unsigned char channel = evt[0] & 0x0F;
-	volatile float* tbl;
 	
-	// do the keyboard split
-	if ((status == 0x80 || status == 0x90) &&
-	    splitpoint > 0 && channel == 0 && evt[1] <= splitpoint)
-	  channel = 2;
-	
-	switch (status) {
-	case evt_noteon: {
-	  unsigned char note = evt[1];
-	  bool percenable = false;
-	  float sustain = *p(n_sustain) + .0001f;
+	if (channel < 3) {
 	  
-	  // here we choose the correct wavetable according to the played note
+	  volatile float* tbl;
+	  
+	  // do the keyboard split
+	  if ((status == 0x80 || status == 0x90) &&
+	      splitpoint > 0 && channel == 0 && evt[1] <= splitpoint)
+	    channel = 2;
+	  
+	  switch (status) {
+	  case evt_noteon: {
+	    unsigned char note = evt[1];
+	    bool percenable = false;
+	    float sustain = *p(n_sustain) + .0001f;
+	    
+	    // here we choose the correct wavetable according to the played note
 #define foldstart 80
-	  if (note > foldstart + 12 + 12)
-	    tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL + 
-			     WAVETABLESIZE * 7];
-	  else if (note > foldstart + 12 + 8)
-	    tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
-			     WAVETABLESIZE * 6];
-	  else if (note > foldstart + 12 + 5)
-	    tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
-			     WAVETABLESIZE * 5];
-	  else if (note > foldstart + 12)
-	    tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
-			     WAVETABLESIZE * 4];
-	  else if (note > foldstart + 8)
-	    tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL + 
-			     WAVETABLESIZE * 3];
-	  else if (note > foldstart + 5)
-	    tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
-			     WAVETABLESIZE * 2];
-	  else if (note > foldstart)
-	    tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
-			     WAVETABLESIZE];
-	  else
-	    tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL];
-	  
-	  if (channel == 0) {
-	    if (*p(n_1_perc) > 0)
-	      percenable = true;
-	    if (*p(n_1_sustain) < 0.5f)
-	      sustain = 0;
+	    if (note > foldstart + 12 + 12)
+	      tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL + 
+			       WAVETABLESIZE * 7];
+	    else if (note > foldstart + 12 + 8)
+	      tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
+			       WAVETABLESIZE * 6];
+	    else if (note > foldstart + 12 + 5)
+	      tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
+			       WAVETABLESIZE * 5];
+	    else if (note > foldstart + 12)
+	      tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
+			       WAVETABLESIZE * 4];
+	    else if (note > foldstart + 8)
+	      tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL + 
+			       WAVETABLESIZE * 3];
+	    else if (note > foldstart + 5)
+	      tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
+			       WAVETABLESIZE * 2];
+	    else if (note > foldstart)
+	      tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL +
+			       WAVETABLESIZE];
+	    else
+	      tbl = &wavetable[channel * WAVETABLESIZE * TABLES_PER_CHANNEL];
+	    
+	    if (channel == 0) {
+	      if (*p(n_1_perc) > 0)
+		percenable = true;
+	      if (*p(n_1_sustain) < 0.5f)
+		sustain = 0;
+	    }
+	    else if (channel == 1) {
+	      if (*p(n_2_perc) > 0)
+		percenable = true;
+	      if (*p(n_2_sustain) < 0.5f)
+		sustain = 0;
+	    }
+	    else if (channel == 2) {
+	      if (*p(n_3_perc) > 0)
+		percenable = true;
+	      if (*p(n_3_sustain) < 0.5f)
+		sustain = 0;
+	    }
+	    
+	    n1.note_on(note, evt[2], tbl, WAVETABLESIZE, 
+		       channel, percenable, click[channel], sustain);
+	    break;
 	  }
-	  else if (channel == 1) {
-	    if (*p(n_2_perc) > 0)
-	      percenable = true;
-	    if (*p(n_2_sustain) < 0.5f)
-	      sustain = 0;
+	    
+	  case evt_noteoff:
+	    n1.note_off(evt[1], channel);
+	    break;
+	    
+	  case 0xB0:
+	    
+	    // all notes off
+	    if (evt[1] >= 0x78 && evt[1] <= 0x7F)
+	      n1.all_notes_off();
+	    
+	    // hold pedal
+	    else if (evt[1] == 0x40) {
+	      pedal = evt[2] >= 64;
+	      if (*p(n_pedalspeed) < 0.5)
+		n1.set_pedal(evt[2], channel);
+	    }
+	    break;
+	    
+	  case evt_pitch: {
+	    float bender = *p(n_bender);
+	    float pitch = (float)(evt[2] * 128 + evt[1]);
+	    if (pitch > 8192 + 600) {
+	      float p = pitch / 8192 - 1;
+	      pitch = p * (float)pow(1.059463094359, int(12 * bender)) + 1 - p;
+	    }
+	    else if(pitch < 8192 - 600) {
+	      float p = (8192 - pitch) / 8192;
+	      pitch = 1 / (p * (float)pow(1.059463094359, 
+					  int(12 * bender)) + 1 - p);
+	    }
+	    else
+	      pitch = 1;
+	    n1.set_pitch(pitch, channel);
+	    break;
 	  }
-	  else if (channel == 2) {
-	    if (*p(n_3_perc) > 0)
-	      percenable = true;
-	    if (*p(n_3_sustain) < 0.5f)
-	      sustain = 0;
+	    
 	  }
-	  
-	  n1.note_on(note, evt[2], tbl, WAVETABLESIZE, 
-		     channel, percenable, click[channel], sustain);
-	  
-	  break;
-	}
-	  
-	case evt_noteoff:
-	  n1.note_off(evt[1], channel);
-	  break;
-	  
-	case 0xB0:
-	  
-	  // all notes off
-	  if (evt[1] >= 0x78 && evt[1] <= 0x7F)
-	    n1.all_notes_off();
-	  
-	  // hold pedal
-	  else if (evt[1] == 0x40) {
-	    pedal = evt[2] >= 64;
-	    if (*p(n_pedalspeed) < 0.5)
-	      n1.set_pedal(evt[2], channel);
-	  }
-	  break;
-	  
-	case evt_pitch: {
-	  float bender = *p(n_bender);
-	  float pitch = (float)(evt[2] * 128 + evt[1]);
-	  if (pitch > 8192 + 600) {
-	    float p = pitch / 8192 - 1;
-	    pitch = p * (float)pow(1.059463094359, int(12 * bender)) + 1 - p;
-	  }
-	  else if(pitch < 8192 - 600) {
-	    float p = (8192 - pitch) / 8192;
-	    pitch = 1 / (p * (float)pow(1.059463094359, 
-					int(12 * bender)) + 1 - p);
-	  }
-	  else
-	    pitch = 1;
-	  n1.set_pitch(pitch, channel);
-	  break;
-	}
-	  
 	}
       }
     }
-
 
   }
   
