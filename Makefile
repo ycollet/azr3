@@ -1,5 +1,5 @@
 PACKAGE_NAME = azr3-jack
-PACKAGE_VERSION = 0.1.295
+PACKAGE_VERSION = 0.1.296
 PKG_DEPS = gtkmm-2.4>=2.8.8 jack>=0.107.0
 
 

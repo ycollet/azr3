@@ -1072,7 +1072,6 @@ unsigned char* AZR3::event_clock(uint32_t offset) {
       unsigned char status = event.buffer[0] & 0xF0;
       if (status >= 0x80 && status <= 0xE0) {
 	++event_index;
-	cout<<hex<<int(status)<<endl;
 	return event.buffer;
       }
     }
