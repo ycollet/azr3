@@ -7,6 +7,7 @@
 #include <gtkmm.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <lash/lash.h>
 
 #include "azr3.hpp"
 #include "azr3_gtk.hpp"
@@ -38,6 +39,7 @@ struct State {
   sem_t gui_changed;
   float gui_controls[63];
   Preset presets[128];
+  lash_client_t* lash_client;
 };
 
 
@@ -182,6 +184,81 @@ int process(jack_nframes_t nframes, void* arg) {
 }
 
 
+bool check_lash_events(State* s, AZR3GUI* gui) {
+  lash_event_t* event;
+  bool go_on = true;
+  while ((event = lash_get_event(s->lash_client))) {
+    
+    // save
+    if (lash_event_get_type(event) == LASH_Save_File) {
+      cerr<<"Received LASH Save command"<<endl;
+      string dir(lash_event_get_string(event));
+      ofstream fout((dir + "/state").c_str());
+      fout<<int(s->program);
+      for (uint32_t i = 0; i < 63; ++i)
+	fout<<" "<<s->gui_controls[i];
+      fout<<endl;
+      write_presets((dir + "/presets").c_str(), s);
+      lash_send_event(s->lash_client, lash_event_new_with_type(LASH_Save_File));
+    }
+    
+    // restore
+    else if (lash_event_get_type(event) == LASH_Restore_File) {
+      cerr<<"Received LASH Restore command"<<endl;
+      string dir(lash_event_get_string(event));
+      for (unsigned char i = 0; i < 128; ++i)
+	s->presets[i].empty = true;
+      load_presets((dir + "/presets").c_str(), s);
+      gui->clear_programs();
+      for (unsigned char i = 0; i < 128; ++i) {
+	if (!s->presets[i].empty)
+	  gui->add_program(i, s->presets[i].name.c_str());
+      }
+      ifstream fin((dir + "/state").c_str());
+      int prog;
+      fin>>prog;
+      gui->set_program(prog);
+      for (uint32_t p = 0; p < 63; ++p) {
+	float tmp;
+	fin>>tmp;
+	gui->set_control(p, tmp);
+      }
+      lash_send_event(s->lash_client, lash_event_new_with_type(LASH_Restore_File));
+    }
+    
+    // quit
+    else if (lash_event_get_type(event) == LASH_Quit) {
+      cerr<<"Received LASH Quit command"<<endl;
+      Gtk::Main::instance()->quit();
+      go_on = false;
+    }
+    
+    lash_event_destroy(event);
+  }
+  return go_on;
+}
+
+
+bool init_lash(int& argc, char**& argv, const std::string& jack_name, 
+	       State* s, AZR3GUI* gui) {
+  s->lash_client = lash_init(lash_extract_args(&argc, &argv), "AZR-3", 
+			     LASH_Config_File, LASH_PROTOCOL(2, 0));
+  if (s->lash_client) {
+    lash_event_t* event = lash_event_new_with_type(LASH_Client_Name);
+    lash_event_set_string(event, "AZR-3");
+    lash_send_event(s->lash_client, event);      
+    lash_jack_client_name(s->lash_client, jack_name.c_str());
+    Glib::signal_timeout().
+      connect(sigc::bind(sigc::bind(&check_lash_events, gui), s), 500);
+  }
+  else
+    cerr<<"Could not initialise LASH!"<<endl;
+  return (s->lash_client != 0);
+}
+
+
+
+
 int main(int argc, char** argv) {
   
   State s;
@@ -258,6 +335,10 @@ int main(int argc, char** argv) {
     }
   }
 
+  // initialise LASH
+  if (!init_lash(argc, argv, jack_get_client_name(s.jack_client), &s, &gui))
+    return -1;
+  
   win.set_title("AZR-3");
   win.set_resizable(false);
   win.add(gui);
@@ -269,6 +350,8 @@ int main(int argc, char** argv) {
   Glib::signal_timeout().
     connect(sigc::bind_return(sigc::bind(sigc::bind(&check_changes, &s), 
 					 &gui), true), 10);
+  Glib::signal_timeout().
+    connect(sigc::bind(sigc::bind(&check_lash_events, &gui), &s), 500);
   kit.run(win);
   jack_deactivate(s.jack_client);
   s.engine->deactivate();
