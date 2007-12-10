@@ -133,6 +133,7 @@ bool engine_changed_control(uint32_t index, float value, State* s) {
 void check_changes(AZR3GUI* gui, State* s) {
   static float tmp[63];
   if (!sem_trywait(&s->engine_changed)) {
+    cerr<<"Yup"<<endl;
     while (!sem_trywait(&s->engine_changed));
     pthread_mutex_lock(&s->engine_wlock);
     memcpy(tmp, s->controls, sizeof(float) * 63);
@@ -145,7 +146,7 @@ void check_changes(AZR3GUI* gui, State* s) {
     }
   }
   if (!sem_trywait(&s->program_changed)) {
-    while (!sem_trywait(&s->engine_changed));
+    while (!sem_trywait(&s->program_changed));
     gui_set_preset(s->program, s, gui);
   }
 }
@@ -176,9 +177,11 @@ int process(jack_nframes_t nframes, void* arg) {
   
   if (s->engine->controls_has_changed())
     sem_post(&s->engine_changed);
-  if (s->engine->received_program_change())
+  unsigned char prog = s->engine->received_program_change();
+  if (prog != 255) {
+    s->program  = prog;
     sem_post(&s->program_changed);
-    
+  }
   
   return 0;
 }
