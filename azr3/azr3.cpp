@@ -87,7 +87,8 @@ AZR3::AZR3(double rate)
     odchanged(true),
     last_r(0),
     last_l(0),
-    m_automated_change(false) {
+    m_automated_change(false),
+    m_program_change(255) {
   
   for (int x = 0; x < kNumParams + 3; ++x)
     m_ports[x] = 0;
@@ -795,6 +796,10 @@ void AZR3::run(uint32_t sampleFrames) {
 	    break;
 	  }
 	    
+	  case 0xC0:
+	    m_program_change = evt[1];
+	    break;
+	    
 	  }
 	}
       }
@@ -1188,6 +1193,13 @@ void* AZR3::worker_function_real() {
 bool AZR3::controls_has_changed() {
   bool tmp = m_automated_change;
   m_automated_change = false;
+  return tmp;
+}
+
+
+unsigned char AZR3::received_program_change() {
+  unsigned char tmp = m_program_change;
+  m_program_change = 255;
   return tmp;
 }
 

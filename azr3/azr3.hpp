@@ -61,6 +61,8 @@ public:
   void run(uint32_t nframes);
   
   bool controls_has_changed();
+  
+  unsigned char received_program_change();
  
 protected: 
  
@@ -202,7 +204,7 @@ protected:
   static uint32_t cc_map[128];
   
   bool m_automated_change;
-  
+  unsigned char m_program_change;
 };
 
 

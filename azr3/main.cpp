@@ -31,7 +31,9 @@ struct State {
   AZR3* engine;
   pthread_mutex_t engine_wlock;
   sem_t engine_changed;
+  sem_t program_changed;
   float controls[63];
+  unsigned char program;
   pthread_mutex_t gui_wlock;
   sem_t gui_changed;
   float gui_controls[63];
@@ -140,6 +142,10 @@ void check_changes(AZR3GUI* gui, State* s) {
       }
     }
   }
+  if (!sem_trywait(&s->program_changed)) {
+    while (!sem_trywait(&s->engine_changed));
+    gui_set_preset(s->program, s, gui);
+  }
 }
 
 
@@ -168,6 +174,9 @@ int process(jack_nframes_t nframes, void* arg) {
   
   if (s->engine->controls_has_changed())
     sem_post(&s->engine_changed);
+  if (s->engine->received_program_change())
+    sem_post(&s->program_changed);
+    
   
   return 0;
 }
@@ -192,6 +201,7 @@ int main(int argc, char** argv) {
   pthread_mutex_init(&s.engine_wlock, 0);
   pthread_mutex_init(&s.gui_wlock, 0);
   sem_init(&s.engine_changed, 0, 0);
+  sem_init(&s.program_changed, 0, 0);
   sem_init(&s.gui_changed, 0, 0);
   
   // load presets
