@@ -59,6 +59,8 @@ public:
   void connect_port(uint32_t port, void* buffer);
   
   void run(uint32_t nframes);
+  
+  bool controls_has_changed();
  
 protected: 
  
@@ -196,6 +198,10 @@ protected:
   sem_t m_qsem;
   
   pthread_t m_worker;
+  
+  static uint32_t cc_map[128];
+  
+  bool m_automated_change;
   
 };
 

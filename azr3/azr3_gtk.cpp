@@ -576,8 +576,6 @@ void AZR3GUI::save_program() {
       if (msg.run() == RESPONSE_NO)
 	continue;
     }
-    //m_save_function(m_controller, (unsigned char)adj.get_value(), 
-    //		      ent.get_text().c_str());
     signal_save_program(adj.get_value(), ent.get_text());
     break;
   }

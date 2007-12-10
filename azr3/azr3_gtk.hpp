@@ -41,8 +41,8 @@ class AZR3GUI : public Gtk::HBox {
 public:
   
   sigc::signal<void, uint32_t, float> signal_set_control;
-  sigc::signal<void, uint32_t> signal_set_program;
-  sigc::signal<void, uint32_t, std::string> signal_save_program;
+  sigc::signal<void, unsigned char> signal_set_program;
+  sigc::signal<void, unsigned char, std::string> signal_save_program;
   
   AZR3GUI();
   
