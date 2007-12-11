@@ -204,7 +204,6 @@ bool Main::engine_changed_control(uint32_t index, float value) {
 void Main::check_changes() {
   static float tmp[63];
   if (!sem_trywait(&m_engine_changed)) {
-    cerr<<"Yup"<<endl;
     while (!sem_trywait(&m_engine_changed));
     pthread_mutex_lock(&m_engine_wlock);
     memcpy(tmp, m_controls, sizeof(float) * 63);
