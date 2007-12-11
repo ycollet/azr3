@@ -25,6 +25,7 @@
 #include <gtkmm.h>
 
 
+/** A simple widget that represents a on/off switch. */
 class Switch : public Gtk::DrawingArea {
 public:
   

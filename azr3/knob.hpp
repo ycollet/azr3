@@ -25,6 +25,7 @@
 #include <gtkmm.h>
 
 
+/** A simple widget that represents a knob. */
 class Knob : public Gtk::DrawingArea {
 public:
   

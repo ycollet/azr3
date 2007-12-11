@@ -25,6 +25,7 @@
 #include <gtkmm.h>
 
 
+/** A simple widget that represents an organ drawbar. */
 class Drawbar : public Gtk::DrawingArea {
 public:
   

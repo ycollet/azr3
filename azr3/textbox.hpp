@@ -29,6 +29,8 @@
 #include <pangomm.h>
 
 
+/** This is the widget that displays the current program and keyboard 
+    splitpoint. */
 class Textbox : public Gtk::DrawingArea {
 public:
   
