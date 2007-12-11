@@ -1,7 +1,7 @@
 This is an JACK port of AZR-3, originally a VST plugin written by 
 Rumpelrausch Täips. It is a tonewheel organ with drawbars, distortion and 
-rotating speakers. There is also a plugin with only the distortion effect.
-It's all licensed under the GNU GPL version 2, see the file COPYING.
+rotating speakers. It's all licensed under the GNU GPL version 2, see the file 
+COPYING.
 
 To install, run 
  
@@ -14,5 +14,3 @@ and then
 and finally, as root
 
  make install
-
-
