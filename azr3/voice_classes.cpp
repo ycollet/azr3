@@ -1,6 +1,6 @@
 /****************************************************************************
     
-    AZR-3 - An LV2 synth plugin
+    AZR-3 - An organ synth
     
     Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
     
@@ -39,7 +39,7 @@
   meter goes up when you hold more notes. The positive effect is: The
   meter goes down if you use less voices...
 */
-#include "voice_classes.h"
+#include "voice_classes.hpp"
 #include <stdio.h>
 #include <string.h>
 #include <math.h>

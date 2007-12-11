@@ -1,18 +1,18 @@
 PACKAGE_NAME = azr3-jack
-PACKAGE_VERSION = 0.1.305
+PACKAGE_VERSION = 0.1.306
 PKG_DEPS = gtkmm-2.4>=2.8.8 jack>=0.107.0 lash-1.0>=0.5.3
 
 
 PROGRAMS = azr3
 
 azr3_SOURCES = \
-	main.cpp \
+	main.cpp main.hpp \
 	azr3.cpp azr3.hpp \
-	Globals.h \
+	globals.hpp \
 	filters.hpp \
-	fx.h fx.cpp \
-	voice_classes.h voice_classes.cpp \
-	azr3_gtk.cpp azr3_gtk.hpp \
+	fx.hpp fx.cpp \
+	voice_classes.hpp voice_classes.cpp \
+	azr3gui.cpp azr3gui.hpp \
 	knob.hpp knob.cpp \
 	switch.hpp switch.cpp \
 	drawbar.hpp drawbar.cpp \

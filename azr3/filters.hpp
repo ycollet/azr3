@@ -52,10 +52,10 @@ private:
   float fs;		// sampling freq
   float fc;		// cutoff freq
   float q;		// resonance
-  float m_f,m_q,m_qnrm;
+  float m_l;	// lp out
   float m_h;	// hp out
   float m_b;	// bp out
-  float m_l;	// lp out
+  float m_f,m_q,m_qnrm;
 };
 
 class filt_lp : public filt1 {
@@ -95,11 +95,11 @@ private:
 
 
 filt1::filt1()
-  : m_l(0),
+  : q(0),
+    m_l(0),
     m_h(0),
     m_b(0),
-    m_f(0),
-    q(0) {
+    m_f(0) {
   
 }
 

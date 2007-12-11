@@ -1,6 +1,6 @@
 /****************************************************************************
     
-    AZR-3 - An LV2 synth plugin
+    AZR-3 - An organ synth
     
     Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
     
@@ -25,7 +25,7 @@
 #ifndef __Voice_Classes_h__
 #define __Voice_Classes_h__
 
-#include "fx.h"
+#include "fx.hpp"
 #include "filters.hpp"
 
 #define MAXVOICES	32

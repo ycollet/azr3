@@ -1,6 +1,6 @@
 /****************************************************************************
     
-    AZR-3 - An LV2 synth plugin
+    AZR-3 - An organ synth
     
     Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
     
@@ -109,4 +109,5 @@ bool Drawbar::on_scroll_event(GdkEventScroll* event) {
   else if (event->direction == GDK_SCROLL_DOWN)
     m_adj.set_value(m_adj.get_value() + 
                     (m_adj.get_upper() - m_adj.get_lower()) / 30);
+  return true;
 }

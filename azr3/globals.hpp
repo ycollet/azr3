@@ -1,6 +1,6 @@
 /****************************************************************************
     
-    AZR-3 - An LV2 synth plugin
+    AZR-3 - An organ synth
     
     Copyright (C) 2006 Lars Luthman <lars.luthman@gmail.com>
     
@@ -183,73 +183,5 @@ enum
 	n_mute
 };
 
-// Let's be friendly and do at least some GUI-less support...
-static char	labels[kNumParams][16]=
-{
-	"Mono    ",
-	"Click   ",
-	"Bender  ",
-	"Shape   ",
-	"Percussn",
-	"Perc-Vol",
-	"PercFade",
-	"Vol 1   ",
-	"Vol 2   ",
-	"Vol 3   ",
-	"Master  ",
-
-	"1/ Perc ",
-	"1/ 16   ",
-	"1/ 5 1/3",
-	"1/ 8    ",
-	"1/ 4    ",
-	"1/ 2 2/3",
-	"1/ 2    ",
-	"1/ 1 3/5",
-	"1/ 1 1/3",
-	"1/ 1    ",
-
-	"1/ Vbrto",
-	"1/ VStr ",
-	"1/ VMix ",
-	"2/ Perc ",
-	"2/ 16   ",
-	"2/ 5 1/3",
-	"2/ 8    ",
-	"2/ 4    ",
-	"2/ 2 2/3",
-	"2/ 2    ",
-
-	"2/ 1 3/5",
-	"2/ 1 1/3",
-	"2/ 1    ",
-	"2/ Vbrto",
-	"2/ VStr ",
-	"2/ VMix ",
-	"3/ Perc ",
-	"3/ 16   ",
-	"3/ 5 1/3",
-	"3/ 8    ",
-
-	"3/ 4    ",
-	"3/ 2 2/3",
-	"Mr.Valve",
-	"Drive   ",
-	"Set     ",
-	"Tone    ",
-	"Mix     ",
-	"Speakers",
-	"Speed   ",
-	"Lowrslow",
-
-	"Lowrfast",
-	"Upprslow",
-	"Upprfast",
-	"Belt    ",
-	"Spread  ",
-	"Complex ",
-	"PdlSpeed",
-	"SplitPnt",
-};
 
 #endif

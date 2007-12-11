@@ -1,6 +1,6 @@
 /****************************************************************************
     
-    AZR-3 - An LV2 synth plugin
+    AZR-3 - An organ synth
     
     Copyright (C) 2006  Lars Luthman <lars.luthman@gmail.com>
     
@@ -33,7 +33,7 @@
 #include "drawbar.hpp"
 #include "knob.hpp"
 #include "switch.hpp"
-#include "Globals.h"
+#include "globals.hpp"
 #include "textbox.hpp"
 
 
@@ -51,10 +51,13 @@ public:
   void remove_program(unsigned char number);
   void set_program(unsigned char number);
   void clear_programs();
+  
+protected:
+
   void control_changed(uint32_t index, float new_value);
   void program_changed(int program);
   
-protected:
+  void on_realize();
   
   static std::string note2str(long note);
   
@@ -62,17 +65,17 @@ protected:
   void set_back_pixmap(Widget* wdg, Glib::RefPtr<Gdk::Pixmap> pm);
   Knob* add_knob(Gtk::Fixed& fbox, unsigned long port, 
                  float min, float max, float value, 
-                 Glib::RefPtr<Gdk::Pixmap>& bg, int xoffset, int yoffset,
+                 int xoffset, int yoffset,
                  float dmin, float dmax, bool decimal);
   Drawbar* add_drawbar(Gtk::Fixed& fbox, unsigned long port, 
                        float min, float max, float value, 
-                       Glib::RefPtr<Gdk::Pixmap>& bg, int xoffset, int yoffset, 
+                       int xoffset, int yoffset, 
                        Drawbar::Type type);
-  Switch* add_switch(Gtk::Fixed& fbox, long port,
+  Switch* add_switch(Gtk::Fixed& fbox, unsigned port,
                      int xoffset, int yoffset, Switch::Type type);
   Gtk::EventBox* add_clickbox(Gtk::Fixed& fbox, int xoffset, int yoffset, 
 			      int width, int height);
-  Textbox* add_textbox(Gtk::Fixed& fbox, Glib::RefPtr<Gdk::Pixmap>& bg, 
+  Textbox* add_textbox(Gtk::Fixed& fbox, 
                        int xoffset, int yoffset, int lines, 
                        int width, int height);
   bool change_mode(bool fx_mode, Gtk::Fixed& fbox);
@@ -84,19 +87,19 @@ protected:
   void save_program();
 
 
-  bool showing_fx_controls;
-  std::vector<Widget*> fx_widgets;
-  std::vector<Widget*> voice_widgets;
-  std::map<int, std::string> programs;
-  int current_program;
-  int splitkey;
-  Textbox* tbox;
-  Switch* splitswitch;
-  Gtk::Adjustment* splitpoint_adj;
-  Gtk::Menu* program_menu;
-  Gdk::Color menu_fg;
-  Gtk::Fixed fbox;
-  Gtk::Fixed vbox;
+  bool m_showing_fx_controls;
+  std::vector<Widget*> m_fx_widgets;
+  std::vector<Widget*> m_voice_widgets;
+  std::map<int, std::string> m_programs;
+  int m_current_program;
+  int m_splitkey;
+  Textbox* m_tbox;
+  Switch* m_splitswitch;
+  Gtk::Adjustment* m_splitpoint_adj;
+  Gtk::Menu* m_program_menu;
+  Gdk::Color m_menu_fg;
+  Gtk::Fixed m_fbox;
+  Gtk::Fixed m_vbox;
   std::vector<Gtk::Adjustment*> m_adj;
 
 };

@@ -1,6 +1,6 @@
 /****************************************************************************
     
-    AZR-3 - An LV2 synth plugin
+    AZR-3 - An organ synth
     
     Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
     
@@ -29,7 +29,6 @@
 #include <jack/midiport.h>
 
 #include "azr3.hpp"
-#include "voice_classes.h"
 
 
 using namespace std;
@@ -39,26 +38,18 @@ AZR3::AZR3(double rate)
   : n1(NUMOFVOICES),
     samplerate(rate),
     rate_scale(rate / 44100.0),
+    samplecount(0),
+    splitpoint(0),
+    vlfo((float)rate),
     vdelay1(int(441 * rate_scale), true),
     vdelay2(int(441 * rate_scale), true),
-    wand_r(int(4410 * rate_scale), false),
-    wand_l(int(4410 * rate_scale), false),
-    delay1(int(4410 * rate_scale), true),
-    delay2(int(4410 * rate_scale), true),
-    delay3(int(4410 * rate_scale),true),
-    delay4(int(4410 * rate_scale),true),
-    vlfo((float)rate),
-    lfo1((float)rate),
-    lfo2((float)rate),
-    lfo3((float)rate),
-    lfo4((float)rate),
-    samplecount(0),
     viblfo(0),
     vmix1(0),
     vmix2(0),
-    oldmrvalve(0),
-    oldmix(0),
     fuzz(0),
+    oldmrvalve(0),
+    odchanged(true),
+    oldmix(0),
     odmix(0),
     n_odmix(1 - odmix),
     n2_odmix(2 - odmix),
@@ -69,8 +60,8 @@ AZR3::AZR3(double rate)
     lspeed(0),
     uspeed(0),
     er_r(0),
-    er_l(0),
     er_r_before(0),
+    er_l(0),
     er_feedback(0),
     llfo_out(0),
     llfo_nout(0),
@@ -80,13 +71,21 @@ AZR3::AZR3(double rate)
     lfo_nout(0),
     lfo_d_out(0),
     lfo_d_nout(0),
-    splitpoint(0),
+    wand_r(int(4410 * rate_scale), false),
+    wand_l(int(4410 * rate_scale), false),
+    delay1(int(4410 * rate_scale), true),
+    delay2(int(4410 * rate_scale), true),
+    delay3(int(4410 * rate_scale),true),
+    delay4(int(4410 * rate_scale),true),
+    lfo1((float)rate),
+    lfo2((float)rate),
+    lfo3((float)rate),
+    lfo4((float)rate),
     last_shape(-1),
     //mute(true),
-    pedal(false),
-    odchanged(true),
     last_r(0),
     last_l(0),
+    pedal(false),
     m_automated_change(false),
     m_program_change(255) {
   
@@ -816,7 +815,6 @@ bool AZR3::make_waveforms(int shape) {
   long    i;
   float   amp = 0.5f;
   float   tw = 0, twfuzz;
-  float   twmix = 0.5f;
   float   twdist = 0.7f;
   float   tws = (float)WAVETABLESIZE;
         

@@ -1,6 +1,6 @@
 /****************************************************************************
     
-    AZR-3 - An LV2 synth plugin
+    AZR-3 - An organ synth
     
     Copyright (C) 2006-2007  Lars Luthman <lars.luthman@gmail.com>
     
@@ -26,7 +26,7 @@
   This is a mixture of simple hacks and sophisticated effect algorithms.
   There's probably a lot of optimization potential in here...
 */
-#include "fx.h"
+#include "fx.hpp"
 
 #include <stdio.h>
 #include <math.h>

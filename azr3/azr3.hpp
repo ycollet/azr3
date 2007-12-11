@@ -1,6 +1,6 @@
 /****************************************************************************
   
-  AZR-3 - An LV2 synth plugin
+  AZR-3 - An organ synth
   
   Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
   
@@ -28,8 +28,8 @@
 #include <semaphore.h>
 #include <stdint.h>
 
-#include "voice_classes.h"
-#include "Globals.h"
+#include "voice_classes.hpp"
+#include "globals.hpp"
 
 
 enum {

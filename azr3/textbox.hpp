@@ -1,6 +1,6 @@
 /****************************************************************************
     
-    AZR-3 - An LV2 synth plugin
+    AZR-3 - An organ synth
     
     Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
     
@@ -34,7 +34,7 @@ public:
   
   Textbox(int width, int height, int lines);
   
-  void set_string(int line, const std::string& str);
+  void set_string(unsigned line, const std::string& str);
   
   sigc::signal<void, int, GdkEventScroll*> signal_scroll_display;
   
