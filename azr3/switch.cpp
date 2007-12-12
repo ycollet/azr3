@@ -19,8 +19,6 @@
 
 ****************************************************************************/
 
-#include <iostream>
-
 #include "switch.hpp"
 #include "vonoff.xpm"
 #include "onoffgreen.xpm"

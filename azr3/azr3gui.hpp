@@ -22,10 +22,6 @@
 #ifndef AZR3_GTK_HPP
 #define AZR3_GTK_HPP
 
-#include <cassert>
-#include <iomanip>
-#include <iostream>
-#include <sstream>
 #include <vector>
 
 #include <gtkmm.h>

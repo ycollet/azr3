@@ -23,8 +23,7 @@
 
 #include <cmath>
 #include <cstring>
-#include <iostream>
-#include <sstream>
+#include <unistd.h>
 
 #include <jack/midiport.h>
 

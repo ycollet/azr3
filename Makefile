@@ -1,5 +1,5 @@
 PACKAGE_NAME = azr3-jack
-PACKAGE_VERSION = 0.1.667
+PACKAGE_VERSION = 0.1.668
 PKG_DEPS = gtkmm-2.4>=2.8.8 jack>=0.107.0 lash-1.0>=0.5.3
 
 
@@ -25,7 +25,7 @@ main_cpp_CFLAGS = -DDATADIR=\"$(pkgdatadir)\"
 
 DATA = azr3/presets
 
-EXTRA_DIST = AUTHORS COPYING README
+EXTRA_DIST = AUTHORS COPYING README ChangeLog
 
 
 # Do the magic

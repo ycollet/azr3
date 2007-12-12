@@ -40,8 +40,6 @@
   meter goes down if you use less voices...
 */
 #include "voice_classes.hpp"
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
 #include <limits>
 #ifdef WIN32

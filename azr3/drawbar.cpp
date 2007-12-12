@@ -19,8 +19,6 @@
 
 ****************************************************************************/
 
-#include <iostream>
-
 #include "drawbar.hpp"
 #include "dbblack.xpm"
 #include "dbbrown.xpm"
