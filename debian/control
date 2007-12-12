@@ -1,0 +1,15 @@
+Source: azr3-jack
+Section: sound
+Priority: extra
+Maintainer: Lars Luthman <lars.luthman@gmail.com>
+Build-Depends: debhelper (>= 5), libgtkmm-2.4-dev (>= 2.10.10), libjack-dev (>= 0.103.0), liblash-dev (>= 0.5.3)
+Standards-Version: 3.7.2
+
+Package: azr3-jack
+Architecture: any
+Depends: libgtkmm-2.4-1c2a (>= 2.10.10), libjack0 (>= 0.103.0), liblash2 (>= 0.5.3)
+Description: A Hammond organ simulator
+ A port of Rumpelrausch Täips' VST plugin AZR-3 which simulates a drawbar
+ organ with a distorting amplifier and a rotating speaker cabinet. This version
+ is a JACK client that can be connected to any other MIDI and audio software
+ using JACK.
