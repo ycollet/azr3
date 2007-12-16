@@ -334,7 +334,7 @@ void AZR3::run(uint32_t sampleFrames) {
   
   jack_nframes_t event_index = 0;
   void* midi = p<void>(63);
-  jack_nframes_t event_count = jack_midi_get_event_count(midi);
+  jack_nframes_t event_count = jack_midi_get_event_count(midi, sampleFrames);
   int     x;
   float last_out1, last_out2;
   unsigned char* evt;
@@ -346,7 +346,7 @@ void AZR3::run(uint32_t sampleFrames) {
     if (event_index == event_count)
       event.time = sampleFrames;
     else
-      jack_midi_event_get(&event, midi, event_index);
+      jack_midi_event_get(&event, midi, event_index, sampleFrames);
     ++event_index;
       
     for ( ; pframe < event.time; ++pframe) {
