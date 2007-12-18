@@ -2,15 +2,14 @@
     
     AZR-3 - An organ synth
     
-    Copyright (C) 2006 Lars Luthman <lars.luthman@gmail.com>
+    Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
     
     based on source code from the VST plugin AZR-3, (C) 2006 Philipp Mott
     (well, almost all of it is his code)
     
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+    it under the terms of the GNU General Public License version 2 as published
+    by the Free Software Foundation.
     
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of

@@ -2,7 +2,7 @@
     
     AZR-3 - An organ synth
     
-    Copyright (C) 2006  Lars Luthman <lars.luthman@gmail.com>
+    Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
     
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License version 2 as published

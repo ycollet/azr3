@@ -2,7 +2,7 @@
     
     AZR-3 - An organ synth
     
-    Copyright (C) 2006-2007  Lars Luthman <lars.luthman@gmail.com>
+    Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
     
     based on source code from the VST plugin AZR-3, (C) 2006 Philipp Mott
     (well, almost all of it is his code)
