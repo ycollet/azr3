@@ -166,6 +166,7 @@ void Main::gui_set_preset(unsigned char number) {
     pthread_mutex_lock(&m_gui_wlock);
     for (int i = 0; i < 63; ++i)
       m_gui_controls[i] = m_presets[number].values[i];
+    m_program = number;
     pthread_mutex_unlock(&m_gui_wlock);
     sem_post(&m_gui_changed);
     for (int i = 0; i < 63; ++i)
@@ -182,6 +183,7 @@ void Main::gui_save_preset(unsigned char number, const string& name) {
     m_presets[number].name = name;
     m_gui->add_program(number, name.c_str());
     m_gui->set_program(number);
+    m_program = number;
     if (getenv("HOME")) {
       char buf[512];
       snprintf(buf, 512, "%s/.azr3_jack_presets", getenv("HOME"));
@@ -247,7 +249,7 @@ int Main::process(jack_nframes_t nframes) {
     sem_post(&m_engine_changed);
   unsigned char prog = m_engine->received_program_change();
   if (prog != 255) {
-    m_program  = prog;
+    m_program = prog;
     sem_post(&m_program_changed);
   }
     
