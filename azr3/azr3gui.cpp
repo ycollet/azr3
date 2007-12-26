@@ -74,7 +74,7 @@ AZR3GUI::AZR3GUI()
   m_vbox.set_style(s);
 
   // add the display
-  m_tbox = add_textbox(m_fbox, 391, 19, 3, 140, 39);
+  m_tbox = add_textbox(m_fbox, pixmap, 391, 19, 3, 140, 39);
   m_tbox->add_events(SCROLL_MASK);
   m_tbox->signal_scroll_display.
     connect(mem_fun(*this, &AZR3GUI::display_scroll));
@@ -93,17 +93,17 @@ AZR3GUI::AZR3GUI()
   
   // upper knobs
   add_switch(m_fbox, n_mono, 61, 105, Switch::Mini);
-  add_knob(m_fbox, n_click, 0, 1, 0.5, 88, 88, 0, 100, false);
-  add_knob(m_fbox, n_bender, 0, 1, 0.5, 132, 88, 0, 12, false);
-  add_knob(m_fbox, n_sustain, 0, 1, 0.5, 176, 88, 0, 100, false);
-  add_knob(m_fbox, n_shape, 0, 1, 0.5, 220, 88, 1, 6, false);
-  add_knob(m_fbox, n_perc, 0, 1, 0.5, 308, 88, 0, 10, false);
-  add_knob(m_fbox, n_percvol, 0, 1, 0.5, 352, 88, 0, 100, false);
-  add_knob(m_fbox, n_percfade, 0, 1, 0.5, 396, 88, 0, 100, false);
-  add_knob(m_fbox, n_vol1, 0, 1, 0.5, 484, 88, 0, 100, false);
-  add_knob(m_fbox, n_vol2, 0, 1, 0.5, 528, 88, 0, 100, false);
-  add_knob(m_fbox, n_vol3, 0, 1, 0.5, 572, 88, 0, 100, false);
-  add_knob(m_fbox, n_master, 0, 1, 0.5, 616, 88, 0, 100, false);
+  add_knob(m_fbox, pixmap, n_click, 0, 1, 0.5, 88, 88, 0, 100, false);
+  add_knob(m_fbox, pixmap, n_bender, 0, 1, 0.5, 132, 88, 0, 12, false);
+  add_knob(m_fbox, pixmap, n_sustain, 0, 1, 0.5, 176, 88, 0, 100, false);
+  add_knob(m_fbox, pixmap, n_shape, 0, 1, 0.5, 220, 88, 1, 6, false);
+  add_knob(m_fbox, pixmap, n_perc, 0, 1, 0.5, 308, 88, 0, 10, false);
+  add_knob(m_fbox, pixmap, n_percvol, 0, 1, 0.5, 352, 88, 0, 100, false);
+  add_knob(m_fbox, pixmap, n_percfade, 0, 1, 0.5, 396, 88, 0, 100, false);
+  add_knob(m_fbox, pixmap, n_vol1, 0, 1, 0.5, 484, 88, 0, 100, false);
+  add_knob(m_fbox, pixmap, n_vol2, 0, 1, 0.5, 528, 88, 0, 100, false);
+  add_knob(m_fbox, pixmap, n_vol3, 0, 1, 0.5, 572, 88, 0, 100, false);
+  add_knob(m_fbox, pixmap, n_master, 0, 1, 0.5, 616, 88, 0, 100, false);
 
   // perc and sustain switches
   add_switch(m_fbox, n_1_perc, 16, 173, Switch::Mini);
@@ -114,33 +114,33 @@ AZR3GUI::AZR3GUI()
   add_switch(m_fbox, n_3_sustain, 542, 214, Switch::Mini);
   
   // drawbars for channel 1
-  add_drawbar(m_fbox, n_1_db1, 0, 1, 0.5, 42, 159, Drawbar::Brown);
-  add_drawbar(m_fbox, n_1_db2, 0, 1, 0.5, 66, 159, Drawbar::Brown);
-  add_drawbar(m_fbox, n_1_db3, 0, 1, 0.5, 90, 159, Drawbar::White);
-  add_drawbar(m_fbox, n_1_db4, 0, 1, 0.5, 114, 159, Drawbar::White);
-  add_drawbar(m_fbox, n_1_db5, 0, 1, 0.5, 138, 159, Drawbar::Black);
-  add_drawbar(m_fbox, n_1_db6, 0, 1, 0.5, 162, 159, Drawbar::White);
-  add_drawbar(m_fbox, n_1_db7, 0, 1, 0.5, 186, 159, Drawbar::Black);
-  add_drawbar(m_fbox, n_1_db8, 0, 1, 0.5, 210, 159, Drawbar::Black);
-  add_drawbar(m_fbox, n_1_db9, 0, 1, 0.5, 234, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_1_db1, 0, 1, 0.5, 42, 159, Drawbar::Brown);
+  add_drawbar(m_fbox, pixmap, n_1_db2, 0, 1, 0.5, 66, 159, Drawbar::Brown);
+  add_drawbar(m_fbox, pixmap, n_1_db3, 0, 1, 0.5, 90, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_1_db4, 0, 1, 0.5, 114, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_1_db5, 0, 1, 0.5, 138, 159, Drawbar::Black);
+  add_drawbar(m_fbox, pixmap, n_1_db6, 0, 1, 0.5, 162, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_1_db7, 0, 1, 0.5, 186, 159, Drawbar::Black);
+  add_drawbar(m_fbox, pixmap, n_1_db8, 0, 1, 0.5, 210, 159, Drawbar::Black);
+  add_drawbar(m_fbox, pixmap, n_1_db9, 0, 1, 0.5, 234, 159, Drawbar::White);
   
   // drawbars for channel 2
-  add_drawbar(m_fbox, n_2_db1, 0, 1, 0.5, 306, 159, Drawbar::Brown);
-  add_drawbar(m_fbox, n_2_db2, 0, 1, 0.5, 330, 159, Drawbar::Brown);
-  add_drawbar(m_fbox, n_2_db3, 0, 1, 0.5, 354, 159, Drawbar::White);
-  add_drawbar(m_fbox, n_2_db4, 0, 1, 0.5, 378, 159, Drawbar::White);
-  add_drawbar(m_fbox, n_2_db5, 0, 1, 0.5, 402, 159, Drawbar::Black);
-  add_drawbar(m_fbox, n_2_db6, 0, 1, 0.5, 426, 159, Drawbar::White);
-  add_drawbar(m_fbox, n_2_db7, 0, 1, 0.5, 450, 159, Drawbar::Black);
-  add_drawbar(m_fbox, n_2_db8, 0, 1, 0.5, 474, 159, Drawbar::Black);
-  add_drawbar(m_fbox, n_2_db9, 0, 1, 0.5, 498, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_2_db1, 0, 1, 0.5, 306, 159, Drawbar::Brown);
+  add_drawbar(m_fbox, pixmap, n_2_db2, 0, 1, 0.5, 330, 159, Drawbar::Brown);
+  add_drawbar(m_fbox, pixmap, n_2_db3, 0, 1, 0.5, 354, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_2_db4, 0, 1, 0.5, 378, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_2_db5, 0, 1, 0.5, 402, 159, Drawbar::Black);
+  add_drawbar(m_fbox, pixmap, n_2_db6, 0, 1, 0.5, 426, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_2_db7, 0, 1, 0.5, 450, 159, Drawbar::Black);
+  add_drawbar(m_fbox, pixmap, n_2_db8, 0, 1, 0.5, 474, 159, Drawbar::Black);
+  add_drawbar(m_fbox, pixmap, n_2_db9, 0, 1, 0.5, 498, 159, Drawbar::White);
 
   // drawbars for channel 3
-  add_drawbar(m_fbox, n_3_db1, 0, 1, 0.5, 570, 159, Drawbar::Brown);
-  add_drawbar(m_fbox, n_3_db2, 0, 1, 0.5, 594, 159, Drawbar::Brown);
-  add_drawbar(m_fbox, n_3_db3, 0, 1, 0.5, 618, 159, Drawbar::White);
-  add_drawbar(m_fbox, n_3_db4, 0, 1, 0.5, 642, 159, Drawbar::White);
-  add_drawbar(m_fbox, n_3_db5, 0, 1, 0.5, 666, 159, Drawbar::Black);
+  add_drawbar(m_fbox, pixmap, n_3_db1, 0, 1, 0.5, 570, 159, Drawbar::Brown);
+  add_drawbar(m_fbox, pixmap, n_3_db2, 0, 1, 0.5, 594, 159, Drawbar::Brown);
+  add_drawbar(m_fbox, pixmap, n_3_db3, 0, 1, 0.5, 618, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_3_db4, 0, 1, 0.5, 642, 159, Drawbar::White);
+  add_drawbar(m_fbox, pixmap, n_3_db5, 0, 1, 0.5, 666, 159, Drawbar::Black);
   
   // mode switcher
   Widget* eb = add_clickbox(m_fbox, 14, 319, 14, 44);
@@ -152,35 +152,36 @@ AZR3GUI::AZR3GUI()
   // Mr Valve controls
   m_fx_widgets.push_back(add_switch(m_fbox, n_mrvalve,
 				  39, 332, Switch::Green));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_drive, 
-				0, 1, 0.5, 44, 352, 0, 100, false));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_set, 
-				0, 1, 0.5, 88, 352, 0, 100, false));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_tone, 0, 
-				1, 0.5, 132, 352, 300, 3500, false));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_mix, 0, 1, 
-				0.5, 176, 352, 0, 100, false));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_drive, 
+				  0, 1, 0.5, 44, 352, 0, 100, false));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_set, 
+				  0, 1, 0.5, 88, 352, 0, 100, false));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_tone, 0, 
+				  1, 0.5, 132, 352, 300, 3500, false));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_mix, 0, 1, 
+				  0.5, 176, 352, 0, 100, false));
   
   // Speaker controls
   m_fx_widgets.push_back(add_switch(m_fbox, n_speakers, 
 				  302, 332, Switch::Green));
   m_fx_widgets.push_back(add_switch(m_fbox, n_speed, 
 				  323, 356, Switch::BigRed));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_l_slow, 
-				0, 1, 0.5, 352, 352, 0, 10, true));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_l_fast, 
-				0, 1, 0.5, 396, 352, 0, 10, true));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_u_slow, 
-				0, 1, 0.5, 440, 352, 0, 10, true));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_u_fast, 
-				0, 1, 0.5, 484, 352, 0, 10, true));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_belt, 
-				0, 1, 0.5, 528, 352, 0, 100, false));
-  m_fx_widgets.push_back(add_knob(m_fbox, n_spread, 
-				0, 1, 0.5, 572, 352, 0, 100, false));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_l_slow, 
+				  0, 1, 0.5, 352, 352, 0, 10, true));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_l_fast, 
+				  0, 1, 0.5, 396, 352, 0, 10, true));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_u_slow, 
+				  0, 1, 0.5, 440, 352, 0, 10, true));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_u_fast, 
+				  0, 1, 0.5, 484, 352, 0, 10, true));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_belt, 
+				  0, 1, 0.5, 528, 352, 0, 100, false));
+  m_fx_widgets.push_back(add_knob(m_fbox, pixmap, n_spread, 
+				  0, 1, 0.5, 572, 352, 0, 100, false));
   m_fx_widgets.push_back(add_switch(m_fbox, n_complex, 
-				  443, 331, Switch::Mini));
-  m_fx_widgets.push_back(add_switch(m_fbox, n_pedalspeed, 510, 331, Switch::Mini));
+				    443, 331, Switch::Mini));
+  m_fx_widgets.push_back(add_switch(m_fbox, n_pedalspeed, 
+				    510, 331, Switch::Mini));
 
   // mode switcher 2
   Widget* eb2 = add_clickbox(m_vbox, 14, 53, 14, 44);
@@ -190,11 +191,11 @@ AZR3GUI::AZR3GUI()
 
   // vibrato controls
   add_switch(m_vbox, n_1_vibrato, 39, 17, Switch::Green);
-  add_knob(m_vbox, n_1_vstrength, 0, 1, 0.5, 88, 37, 0, 100, false);
-  add_knob(m_vbox, n_1_vmix, 0, 1, 0.5, 176, 37, 0, 100, false);
+  add_knob(m_vbox, voicepxm, n_1_vstrength, 0, 1, 0.5, 88, 37, 0, 100, false);
+  add_knob(m_vbox, voicepxm, n_1_vmix, 0, 1, 0.5, 176, 37, 0, 100, false);
   add_switch(m_vbox, n_2_vibrato, 302, 17, Switch::Green);
-  add_knob(m_vbox, n_2_vstrength, 0, 1, 0.5, 352, 37, 0, 100, false);
-  add_knob(m_vbox, n_2_vmix, 0, 1, 0.5, 440, 37, 0, 100, false);
+  add_knob(m_vbox, voicepxm, n_2_vstrength, 0, 1, 0.5, 352, 37, 0, 100, false);
+  add_knob(m_vbox, voicepxm, n_2_vmix, 0, 1, 0.5, 440, 37, 0, 100, false);
   
   pack_start(m_fbox);
     
@@ -321,55 +322,73 @@ void AZR3GUI::set_back_pixmap(Widget* wdg, RefPtr<Pixmap> pm) {
 }
 
 
-Knob* AZR3GUI::add_knob(Fixed& fbox, unsigned long port, 
+Knob* AZR3GUI::add_knob(Fixed& fbox, RefPtr<Pixmap>& pm, int port, 
 			float min, float max, float value, 
 			int xoffset, int yoffset,
 			float dmin, float dmax, bool decimal) {
   Knob* knob = manage(new Knob(min, max, value, dmin, dmax, decimal));
   fbox.put(*knob, xoffset, yoffset);
-  knob->modify_bg_pixmap(STATE_NORMAL, "<parent>");
-  knob->modify_bg_pixmap(STATE_ACTIVE, "<parent>");
-  knob->modify_bg_pixmap(STATE_PRELIGHT, "<parent>");
-  knob->modify_bg_pixmap(STATE_SELECTED, "<parent>");
-  knob->modify_bg_pixmap(STATE_INSENSITIVE, "<parent>");
-  knob->get_adjustment().signal_value_changed().
-    connect(compose(bind<0>(mem_fun(*this, &AZR3GUI::control_changed), port),
-		    mem_fun(knob->get_adjustment(), &Adjustment::get_value)));
-  assert(m_adj[port] == 0);
-  m_adj[port] = &knob->get_adjustment();
+  int w, h;
+  knob->get_size_request(w, h);
+  RefPtr<Style> s = knob->get_style()->copy();
+  RefPtr<Pixmap> npm = Pixmap::create(pm, w, h);
+  RefPtr<GC> gc = GC::create(npm);
+  npm->draw_drawable(gc, pm, xoffset, yoffset, 0, 0, w, h);
+  s->set_bg_pixmap(STATE_NORMAL, npm);
+  s->set_bg_pixmap(STATE_ACTIVE, npm);
+  s->set_bg_pixmap(STATE_PRELIGHT, npm);
+  s->set_bg_pixmap(STATE_SELECTED, npm);
+  s->set_bg_pixmap(STATE_INSENSITIVE, npm);
+  knob->set_style(s);
+  if (port >= 0 && port < m_adj.size()) {
+    knob->get_adjustment().signal_value_changed().
+      connect(compose(bind<0>(mem_fun(*this, &AZR3GUI::control_changed), port),
+		      mem_fun(knob->get_adjustment(), 
+			      &Adjustment::get_value)));
+    assert(m_adj[port] == 0);
+    m_adj[port] = &knob->get_adjustment();
+  }
   return knob;
 }
 
 
-Drawbar* AZR3GUI::add_drawbar(Fixed& fbox, unsigned long port, 
+Drawbar* AZR3GUI::add_drawbar(Fixed& fbox, RefPtr<Pixmap>& pm, int port, 
 			      float min, float max, float value, 
 			      int xoffset, int yoffset, 
 			      Drawbar::Type type) {
   Drawbar* db = manage(new Drawbar(min, max, value, type));
   fbox.put(*db, xoffset, yoffset);
-  db->modify_bg_pixmap(STATE_NORMAL, "<parent>");
-  db->modify_bg_pixmap(STATE_ACTIVE, "<parent>");
-  db->modify_bg_pixmap(STATE_PRELIGHT, "<parent>");
-  db->modify_bg_pixmap(STATE_SELECTED, "<parent>");
-  db->modify_bg_pixmap(STATE_INSENSITIVE, "<parent>");
-  db->get_adjustment().signal_value_changed().
-    connect(compose(bind<0>(mem_fun(*this, &AZR3GUI::control_changed), port),
-		    mem_fun(db->get_adjustment(), &Adjustment::get_value)));
-  assert(m_adj[port] == 0);
-  m_adj[port] = &db->get_adjustment();
-  
+  int w, h;
+  db->get_size_request(w, h);
+  RefPtr<Style> s = db->get_style()->copy();
+  RefPtr<Pixmap> npm = Pixmap::create(pm, w, h);
+  RefPtr<GC> gc = GC::create(npm);
+  npm->draw_drawable(gc, pm, xoffset, yoffset, 0, 0, w, h);
+  s->set_bg_pixmap(STATE_NORMAL, npm);
+  s->set_bg_pixmap(STATE_ACTIVE, npm);
+  s->set_bg_pixmap(STATE_PRELIGHT, npm);
+  s->set_bg_pixmap(STATE_SELECTED, npm);
+  s->set_bg_pixmap(STATE_INSENSITIVE, npm);
+  db->set_style(s);
+  if (port >= 0 && port < m_adj.size()) {
+    db->get_adjustment().signal_value_changed().
+      connect(compose(bind<0>(mem_fun(*this, &AZR3GUI::control_changed), port),
+		      mem_fun(db->get_adjustment(), &Adjustment::get_value)));
+    assert(m_adj[port] == 0);
+    m_adj[port] = &db->get_adjustment();
+  }
   return db;
 }
 
 
-Switch* AZR3GUI::add_switch(Fixed& fbox, unsigned port,
+Switch* AZR3GUI::add_switch(Fixed& fbox, int port,
 			    int xoffset, int yoffset, Switch::Type type) {
   Switch* sw = manage(new Switch(type));
   fbox.put(*sw, xoffset, yoffset);
-  sw->get_adjustment().signal_value_changed().
-    connect(compose(bind<0>(mem_fun(*this, &AZR3GUI::control_changed),port),
-		    mem_fun(sw->get_adjustment(), &Adjustment::get_value)));
-  if (port < m_adj.size()) {
+  if (port >= 0 && port < m_adj.size()) {
+    sw->get_adjustment().signal_value_changed().
+      connect(compose(bind<0>(mem_fun(*this, &AZR3GUI::control_changed),port),
+		      mem_fun(sw->get_adjustment(), &Adjustment::get_value)));
     assert(m_adj[port] == 0);
     m_adj[port] = &sw->get_adjustment();
   }
@@ -388,16 +407,23 @@ EventBox* AZR3GUI::add_clickbox(Fixed& fbox, int xoffset, int yoffset,
 }
 
 
-Textbox* AZR3GUI::add_textbox(Fixed& fbox,  
+Textbox* AZR3GUI::add_textbox(Fixed& fbox, RefPtr<Pixmap>& pm,
 			      int xoffset, int yoffset, int lines, 
 			      int width, int height) {
   Textbox* db = manage(new Textbox(width, height, lines));
   fbox.put(*db, xoffset, yoffset);
-  db->modify_bg_pixmap(STATE_NORMAL, "<parent>");
-  db->modify_bg_pixmap(STATE_ACTIVE, "<parent>");
-  db->modify_bg_pixmap(STATE_PRELIGHT, "<parent>");
-  db->modify_bg_pixmap(STATE_SELECTED, "<parent>");
-  db->modify_bg_pixmap(STATE_INSENSITIVE, "<parent>");
+  int w, h;
+  db->get_size_request(w, h);
+  RefPtr<Style> s = db->get_style()->copy();
+  RefPtr<Pixmap> npm = Pixmap::create(pm, w, h);
+  RefPtr<GC> gc = GC::create(npm);
+  npm->draw_drawable(gc, pm, xoffset, yoffset, 0, 0, w, h);
+  s->set_bg_pixmap(STATE_NORMAL, npm);
+  s->set_bg_pixmap(STATE_ACTIVE, npm);
+  s->set_bg_pixmap(STATE_PRELIGHT, npm);
+  s->set_bg_pixmap(STATE_SELECTED, npm);
+  s->set_bg_pixmap(STATE_INSENSITIVE, npm);
+  db->set_style(s);
   return db;
 }
 
