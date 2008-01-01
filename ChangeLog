@@ -1,2 +1,9 @@
-Version 1.0.0 (2007-12-24):
+Version 1.0.1 (2007-12-26):
+	* Fixed crashing bug reported by Sebastian Tschöpel
+	* Treat Note On with velocity 0 as Note Off (not sure if that is 
+	  allowed in JACK but it doesn't hurt)
+	* Fixed graphics bug that broke the background pixmaps for the text
+	  box and all the knobs and drawbars
+
+Version 1.0 (2007-12-24):
 	* First release
