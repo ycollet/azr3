@@ -481,6 +481,7 @@ void AZR3GUI::update_program_menu() {
       connect(bind(mem_fun(*this, &AZR3GUI::program_changed), iter->first));
     m_program_menu->items().push_back(*item);
     item->show();
+    item->get_child()->modify_bg(STATE_NORMAL, m_menu_bg);
     item->get_child()->modify_fg(STATE_NORMAL, m_menu_fg);
   }
 }
@@ -488,8 +489,7 @@ void AZR3GUI::update_program_menu() {
 
 Menu* AZR3GUI::create_menu() {
   
-  Color bg;
-  bg.set_rgb(16000, 16000, 16000);
+  m_menu_bg.set_rgb(16000, 16000, 16000);
   m_menu_fg.set_rgb(65535, 65535, 50000);
   Menu* menu = manage(new Menu);
   
@@ -499,20 +499,22 @@ Menu* AZR3GUI::create_menu() {
   MenuItem* program_item = manage(new MenuItem("Select program"));
   program_item->set_submenu(*m_program_menu);
   program_item->show();
+  program_item->get_child()->modify_fg(STATE_NORMAL, m_menu_bg);
   program_item->get_child()->modify_fg(STATE_NORMAL, m_menu_fg);
   
   MenuItem* save_item = manage(new MenuItem("Save program"));
   save_item->signal_activate().
     connect(mem_fun(*this, &AZR3GUI::save_program));
   save_item->show();
+  save_item->get_child()->modify_fg(STATE_NORMAL, m_menu_bg);
   save_item->get_child()->modify_fg(STATE_NORMAL, m_menu_fg);
   
   menu->items().push_back(*program_item);
   menu->items().push_back(*save_item);
   
-  menu->modify_bg(STATE_NORMAL, bg);
+  menu->modify_bg(STATE_NORMAL, m_menu_bg);
   menu->modify_fg(STATE_NORMAL, m_menu_fg);
-  m_program_menu->modify_bg(STATE_NORMAL, bg);
+  m_program_menu->modify_bg(STATE_NORMAL, m_menu_bg);
   m_program_menu->modify_fg(STATE_NORMAL, m_menu_fg);
   
   return menu;
