@@ -1,11 +1,15 @@
 Version 1.2.0 (ONGOING):
+	* Converted the XPM graphics to PNG to save process memory, 
+	  installation size and tarball size
+
+Version 1.0.3 (2008-05-15):
 	* Fixed some #include bugs that were only exposed in GCC 4.3
 
 Version 1.0.2 (2008-01-07):
 	* Added compatibility code for new JACK API (>= 0.107)
 
 Version 1.0.1 (2007-12-26):
-	* Fixed crashing bug reported by Sebastian TschÃ¶pel
+	* Fixed crashing bug reported by Sebastian Tschöpel
 	* Treat Note On with velocity 0 as Note Off (not sure if that is 
 	  allowed in JACK but it doesn't hurt)
 	* Fixed graphics bug that broke the background pixmaps for the text
