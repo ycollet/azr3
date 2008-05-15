@@ -48,6 +48,8 @@ public:
   void set_program(unsigned char number);
   void clear_programs();
   
+  static Glib::RefPtr<Gdk::Pixmap> pixmap_from_file(const std::string& file, Glib::RefPtr<Gdk::Bitmap>* bitmap = 0);
+  
 protected:
 
   void control_changed(uint32_t index, float new_value);

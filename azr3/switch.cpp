@@ -21,10 +21,8 @@
 
 #include <cstring>
 
+#include "azr3gui.hpp"
 #include "switch.hpp"
-#include "vonoff.xpm"
-#include "onoffgreen.xpm"
-#include "minioffon.xpm"
 
 
 using namespace Gtk;
@@ -67,19 +65,14 @@ Gtk::Adjustment& Switch::get_adjustment() {
 
 void Switch::on_realize() {
   DrawingArea::on_realize();
-  unsigned pixsize = (m_width * m_height * 2 + 1) / 8;
-  char* bits = new char[pixsize];
-  std::memset(bits, 0, sizeof(char) * pixsize);
-  RefPtr<Bitmap> bitmap = Bitmap::create(bits, m_width, m_height * 2);
-  const char** xpm = 0;
+  string filename;
   if (m_type == BigRed)
-    xpm = vonoff;
+    filename = DATADIR "/vonoff.png";
   else if (m_type == Green)
-    xpm = onoffgreen;
+    filename = DATADIR "/onoffgreen.png";
   else if (m_type == Mini)
-    xpm = minioffon;
-  m_pixmap = Pixmap::create_from_xpm(Colormap::get_system(), bitmap, xpm);
-  delete [] bits;
+    filename = DATADIR "/minioffon.png";
+  m_pixmap = AZR3GUI::pixmap_from_file(filename);
 }
 
 
