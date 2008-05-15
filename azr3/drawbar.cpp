@@ -21,10 +21,8 @@
 
 #include <cstring>
 
+#include "azr3gui.hpp"
 #include "drawbar.hpp"
-#include "dbblack.xpm"
-#include "dbbrown.xpm"
-#include "dbwhite.xpm"
 
 
 using namespace Gtk;
@@ -55,16 +53,12 @@ Gtk::Adjustment& Drawbar::get_adjustment() {
 
 void Drawbar::on_realize() {
   DrawingArea::on_realize();
-  unsigned pixsize = 22 * 150;
-  char bits[22 * 150];
-  std::memset(bits, 0, sizeof(char) * pixsize);
-  m_bitmap = Bitmap::create(bits, 22, 150);
-  const char** xpm = dbblack;
+  string filename = DATADIR "/dbblack.png";
   if (m_type == White)
-    xpm = dbwhite;
+    filename = DATADIR "/dbwhite.png";
   else if (m_type == Brown)
-    xpm = dbbrown;
-  m_pixmap = Pixmap::create_from_xpm(Colormap::get_system(), m_bitmap, xpm);
+    filename = DATADIR "/dbbrown.png";
+  m_pixmap = AZR3GUI::pixmap_from_file(filename);
 }
 
 

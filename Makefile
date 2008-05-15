@@ -17,15 +17,15 @@ azr3_SOURCES = \
 	knob.hpp knob.cpp \
 	switch.hpp switch.cpp \
 	drawbar.hpp drawbar.cpp \
-	textbox.hpp textbox.cpp \
-	cknob.xpm minioffon.xpm onoffgreen.xpm panelfx.xpm vonoff.xpm voice.xpm num_yellow.xpm dbblack.xpm dbbrown.xpm dbwhite.xpm
+	textbox.hpp textbox.cpp
 azr3_SOURCEDIR = azr3
-azr3_CFLAGS = `pkg-config --cflags gtkmm-2.4 jack lash-1.0`
+azr3_CFLAGS = `pkg-config --cflags gtkmm-2.4 jack lash-1.0` -DDATADIR=\"$(pkgdatadir)\"
 azr3_LDFLAGS = `pkg-config --libs gtkmm-2.4 jack lash-1.0`
-main_cpp_CFLAGS = -DDATADIR=\"$(pkgdatadir)\"
 azr3_cpp_CFLAGS = $(shell if pkg-config --atleast-version=0.107 jack ; then echo -include azr3/newjack.hpp; fi)
 
-DATA = azr3/presets
+DATA = \
+	azr3/presets \
+	azr3/cknob.png azr3/minioffon.png azr3/onoffgreen.png azr3/panelfx.png azr3/vonoff.png azr3/voice.png azr3/num_yellow.png azr3/dbblack.png azr3/dbbrown.png azr3/dbwhite.png
 
 EXTRA_DIST = AUTHORS COPYING README ChangeLog
 

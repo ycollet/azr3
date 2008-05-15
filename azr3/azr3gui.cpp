@@ -26,8 +26,6 @@
 #include <gtkmm.h>
 
 #include "azr3gui.hpp"
-#include "panelfx.xpm"
-#include "voice.xpm"
 
 
 using namespace Gtk;
@@ -48,11 +46,9 @@ AZR3GUI::AZR3GUI()
   m_fbox.put(m_vbox, 0, 615);
   m_voice_widgets.push_back(&m_vbox);
   
-  RefPtr<Bitmap> bitmap;
-  RefPtr<Pixmap> pixmap = Pixmap::create_from_xpm(Colormap::get_system(),
-						  bitmap, panelfx);
-  RefPtr<Pixmap> voicepxm = Pixmap::create_from_xpm(Colormap::get_system(),
-						    bitmap, voice);
+  RefPtr<Pixmap> pixmap = pixmap_from_file(DATADIR "/panelfx.png");
+  RefPtr<Pixmap> voicepxm = pixmap_from_file(DATADIR "/voice.png");
+  
   int w, h;
   pixmap->get_size(w, h);
   m_fbox.set_size_request(w, h);
@@ -245,6 +241,19 @@ void AZR3GUI::clear_programs() {
     m_programs.clear();
     update_program_menu();
   }
+}
+
+
+Glib::RefPtr<Gdk::Pixmap> AZR3GUI::pixmap_from_file(const std::string& file, RefPtr<Bitmap>* bitmap) {
+  RefPtr<Pixbuf> pixbuf = Pixbuf::create_from_file(file);
+  RefPtr<Pixmap> pixmap;
+  if (bitmap)
+    pixbuf->render_pixmap_and_mask(pixmap, *bitmap, 255);
+  else {
+    RefPtr<Bitmap> tmp;
+    pixbuf->render_pixmap_and_mask(pixmap, tmp, 255);
+  }
+  return pixmap;
 }
 
   

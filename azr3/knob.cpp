@@ -21,9 +21,8 @@
 
 #include <cstring>
 
+#include "azr3gui.hpp"
 #include "knob.hpp"
-#include "cknob.xpm"
-#include "num_yellow.xpm"
 
 
 using namespace Gtk;
@@ -61,14 +60,12 @@ Gtk::Adjustment& Knob::get_adjustment() {
 
 void Knob::on_realize() {
   DrawingArea::on_realize();
-  const unsigned pixsize = (44 * 1804 + 1) / 8;
   char bits[(44 * 1804 + 1) / 8];
-  memset(bits, 0, sizeof(char) * pixsize);
+  memset(bits, 0, (44 * 1804 + 1) / 8);
   m_bitmap = Bitmap::create(bits, 44, 1804);
-  m_pixmap = Pixmap::create_from_xpm(Colormap::get_system(), m_bitmap, cknob);
   m_digbit = Bitmap::create(bits, 5, 84);
-  m_digpix = Pixmap::create_from_xpm(Colormap::get_system(), m_digbit, 
-                                     num_yellow);
+  m_pixmap = AZR3GUI::pixmap_from_file(DATADIR "/cknob.png", &m_bitmap);
+  m_digpix = AZR3GUI::pixmap_from_file(DATADIR "/num_yellow.png", &m_digbit);
 }
 
 
