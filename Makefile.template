@@ -384,9 +384,12 @@ deb-dir: debian dist
 	cd deb && gzip $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar
 	cd deb && mv $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.gz $(PACKAGE_NAME)_$(PACKAGE_VERSION).orig.tar.gz
 	cp -R debian deb/$(PACKAGE_NAME)-$(PACKAGE_VERSION)
-	cd deb/$(PACKAGE_NAME)-$(PACKAGE_VERSION) && (dch -v $(PACKAGE_VERSION) "User package build" || true)
-	cd deb/$(PACKAGE_NAME)-$(PACKAGE_VERSION) && dpkg-buildpackage -b -ptrue -i -rfakeroot
+	cd deb/$(PACKAGE_NAME)-$(PACKAGE_VERSION) && (dch -v $(PACKAGE_VERSION)-1 "User package build" || true)
 
 deb: deb-dir
+	cd deb/$(PACKAGE_NAME)-$(PACKAGE_VERSION) && dpkg-buildpackage -b -ptrue -i -rfakeroot
 	mv -f deb/*.deb .
 	rm -rf deb
+
+deb-full: deb-dir
+	cd deb/$(PACKAGE_NAME)-$(PACKAGE_VERSION) && dpkg-buildpackage -i -rfakeroot

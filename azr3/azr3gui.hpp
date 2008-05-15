@@ -93,6 +93,7 @@ protected:
   Switch* m_splitswitch;
   Gtk::Adjustment* m_splitpoint_adj;
   Gtk::Menu* m_program_menu;
+  Gdk::Color m_menu_bg;
   Gdk::Color m_menu_fg;
   Gtk::Fixed m_fbox;
   Gtk::Fixed m_vbox;

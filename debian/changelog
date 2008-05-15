@@ -1,6 +1,6 @@
-azr3-jack (1.0.0-1) unstable; urgency=low
+azr3-jack (1.0.2-1) unstable; urgency=low
 
-  * Initial release
+  * Initial Debian release
 
- -- Lars Luthman <lars.luthman@gmail.com>  Wed, 24 Dec 2007 17:00:00 +0100
+ -- Lars Luthman <lars.luthman@gmail.com>  Tue, 01 Jan 2008 22:45:00 +0100
 
