@@ -1,0 +1,11 @@
+Ideas to implement some time in the future in a galaxy far away:
+
+[ ] Add an input port and mix the input with the organ before the distortion 
+    and rotating speaker effects
+[ ] Theme support (different PNG files, maybe different control positions 
+    specified in a text file)
+[ ] LV2 frontend
+
+If anyone else feels like coding any of these and posting a patch in the tracker
+at https://savannah.nongnu.org/patch/?group=ll-plugins, go ahead. I can't 
+promise to include it in the official version though.
