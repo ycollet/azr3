@@ -19,6 +19,8 @@
 
 ****************************************************************************/
 
+#include <cstring>
+
 #include "drawbar.hpp"
 #include "dbblack.xpm"
 #include "dbbrown.xpm"
@@ -55,7 +57,7 @@ void Drawbar::on_realize() {
   DrawingArea::on_realize();
   unsigned pixsize = 22 * 150;
   char bits[22 * 150];
-  memset(bits, 0, sizeof(char) * pixsize);
+  std::memset(bits, 0, sizeof(char) * pixsize);
   m_bitmap = Bitmap::create(bits, 22, 150);
   const char** xpm = dbblack;
   if (m_type == White)

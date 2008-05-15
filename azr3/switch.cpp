@@ -19,6 +19,8 @@
 
 ****************************************************************************/
 
+#include <cstring>
+
 #include "switch.hpp"
 #include "vonoff.xpm"
 #include "onoffgreen.xpm"
@@ -67,7 +69,7 @@ void Switch::on_realize() {
   DrawingArea::on_realize();
   unsigned pixsize = (m_width * m_height * 2 + 1) / 8;
   char* bits = new char[pixsize];
-  memset(bits, 0, sizeof(char) * pixsize);
+  std::memset(bits, 0, sizeof(char) * pixsize);
   RefPtr<Bitmap> bitmap = Bitmap::create(bits, m_width, m_height * 2);
   const char** xpm = 0;
   if (m_type == BigRed)

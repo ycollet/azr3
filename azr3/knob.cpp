@@ -19,6 +19,8 @@
 
 ****************************************************************************/
 
+#include <cstring>
+
 #include "knob.hpp"
 #include "cknob.xpm"
 #include "num_yellow.xpm"

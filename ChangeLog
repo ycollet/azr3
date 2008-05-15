@@ -1,3 +1,6 @@
+Version 1.0.3 (ONGOING):
+	* Fixed some #include bugs that were only exposed in GCC 4.3
+
 Version 1.0.2 (2008-01-07):
 	* Added compatibility code for new JACK API (>= 0.107)
 
