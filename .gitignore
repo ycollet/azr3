@@ -16,7 +16,7 @@
 *~
 
 # The Program
-src/gui/dino
+azr3/azr3
 
 # Local installation directory (if you use 
   'configure --prefix=`pwd`/installation')
