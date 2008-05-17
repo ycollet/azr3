@@ -1,0 +1,23 @@
+# Untracked files and directories that Git should ignore (they won't be listed
+# by 'git status'
+
+# Generic build products
+*.o
+*.so
+*.o
+*.a
+
+# Build system generated files
+/Makefile.config
+/Makefile.deps
+*.dep
+
+# Editor backups
+*~
+
+# The Program
+src/gui/dino
+
+# Local installation directory (if you use 
+  'configure --prefix=`pwd`/installation')
+installation/
