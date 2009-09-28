@@ -22,6 +22,7 @@
 #ifndef AZR3_GTK_HPP
 #define AZR3_GTK_HPP
 
+#include <stdint.h>
 #include <vector>
 
 #include <gtkmm.h>
