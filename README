@@ -14,3 +14,23 @@ and then
 and finally, as root
 
  make install
+
+If you have AZR3_JACK_MIDI_INPUT and/or AZR3_JACK_AUDIO_OUTPUT set in your
+environment the synth will try to autoconnect its MIDI input ports and
+audio output ports to the JACK clients or ports named in those variables.
+For example, if you do this:
+
+  AZR3_JACK_MIDI_INPUT=system AZR3_JACK_AUDIO_OUTPUT=system azr3
+
+then azr3 will connect its MIDI input port to the first MIDI output port
+in the JACK client "system" and its audio output ports to the first and second
+audio input ports in the client "system". You can also select individual ports,
+like this:
+
+  AZR3_JACK_MIDI_INPUT="system:My Keyboard" azr3
+
+azr3 will then connect its MIDI input port to the MIDI output port
+"system:My Keyboard".
+
+Ports will never be autoconnected when azr3 is started by lashd as part of
+a reloaded session.

@@ -46,7 +46,10 @@ protected:
 
   bool check_lash_events();
 
-  bool init_lash(int& argc, char**& argv, const std::string& jack_name);
+  bool init_lash(int& argc, char**& argv,
+		 const std::string& jack_name, bool& started_by_lashd);
+
+  void auto_connect();
 
   static int static_process(jack_nframes_t frames, void* arg);
 
@@ -68,6 +71,7 @@ protected:
   Preset m_presets[128];
   lash_client_t* m_lash_client;
   bool m_ok;
+  bool m_started_by_lashd;
   
   Gtk::Main* m_kit;
   Gtk::Window* m_win;
