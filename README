@@ -30,7 +30,9 @@ like this:
   AZR3_JACK_MIDI_INPUT="system:My Keyboard" azr3
 
 azr3 will then connect its MIDI input port to the MIDI output port
-"system:My Keyboard".
+"system:My Keyboard". You can of course also set these variables permanently
+in you startup files (e.g. ~/.bash_profile) to avoid having to set them
+every time you start azr3.
 
 Ports will never be autoconnected when azr3 is started by lashd as part of
 a reloaded session.
