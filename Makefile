@@ -27,7 +27,7 @@ DATA = \
 	azr3/presets \
 	azr3/cknob.png azr3/minioffon.png azr3/onoffgreen.png azr3/panelfx.png azr3/vonoff.png azr3/voice.png azr3/num_yellow.png azr3/dbblack.png azr3/dbbrown.png azr3/dbwhite.png
 
-EXTRA_DIST = AUTHORS COPYING README ChangeLog
+DOCS = AUTHORS COPYING README ChangeLog
 
 
 # Do the magic
