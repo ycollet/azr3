@@ -1,7 +1,7 @@
 Version 1.2.0 (ONGOING):
-	* Added automatic JACK port connection if the environment variables
-	  AZR3_JACK_MIDI_INPUT or AZR3_JACK_AUDIO_OUTPUT are set to JACK
-	  client or port names
+	* Added automatic JACK port connection using the command line options
+	  --audio-output and --midi-input (or the environment variables
+	  AZR3_JACK_AUDIO_OUTPUT and AZR3_JACK_MIDI_INPUT)
 	* Converted the XPM graphics to PNG to save process memory,
 	  installation size and tarball size
 
