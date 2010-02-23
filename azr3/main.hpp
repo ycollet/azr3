@@ -1,3 +1,24 @@
+/****************************************************************************
+    
+    AZR-3 - An organ synth
+    
+    Copyright (C) 2006-2010 Lars Luthman <lars.luthman@gmail.com>
+    
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License version 2 as published
+    by the Free Software Foundation.
+    
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 01222-1307  USA
+
+****************************************************************************/
+
 #include <string>
 
 #include <jack/jack.h>
@@ -46,8 +67,7 @@ protected:
 
   bool check_lash_events();
 
-  bool init_lash(int& argc, char**& argv,
-		 const std::string& jack_name, bool& started_by_lashd);
+  bool init_lash(lash_args_t* lash_args, const std::string& jack_name);
 
   void auto_connect();
 
@@ -70,8 +90,11 @@ protected:
   float m_gui_controls[63];
   Preset m_presets[128];
   lash_client_t* m_lash_client;
+
   bool m_ok;
   bool m_started_by_lashd;
+  std::string m_auto_midi;
+  std::string m_auto_audio;
   
   Gtk::Main* m_kit;
   Gtk::Window* m_win;

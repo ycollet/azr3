@@ -2,7 +2,7 @@
     
     AZR-3 - An organ synth
     
-    Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
+    Copyright (C) 2006-2010 Lars Luthman <lars.luthman@gmail.com>
     
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License version 2 as published
@@ -23,14 +23,62 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 
 #include "main.hpp"
-
+#include "options.hpp"
 
 using namespace std;
 
 
 Main::Main(int& argc, char**& argv) : m_ok(false) {
+  
+  /* this is a bit dumb, but the only way I know of to check whether we were
+     started by lashd is to see if lash_extract_args() removes any arguments */
+  int old_argc = argc;  
+  lash_args_t* lash_args = lash_extract_args(&argc, &argv);
+  m_started_by_lashd = (argc != old_argc);
+  
+  // parse all non-LASH arguments
+  OptionParser op;
+  bool help(false);
+  bool version(false);
+  try {
+    op.set_env_prefix("AZR3_JACK_")
+      .add_bare("help", "h", help, 
+		"Display this help text and exit.")
+      .add_bare("version", "v", version, 
+		"Display version information and exit.")
+      .add("midi-input", "m", "PORT|CLIENT", m_auto_midi,
+	   "When used, azr3 will try to connect its MIDI input\n"
+	   "port to PORT (if it's a JACK port name) or the\n"
+	   "first MIDI output port in CLIENT (if it's a JACK\n"
+	   "client name).")
+      .add("audio-output", "a", "PORT|CLIENT", m_auto_audio,
+	   "When used, azr3 will try to connect its audio\n"
+	   "output ports to PORT (if it's a JACK port name) or\n"
+	   "the first two audio input ports in CLIENT (if it's\n"
+	   "a JACK client name).")
+      .parse_env()
+      .parse(argc, argv);
+  }
+  catch (runtime_error& e) {
+    cerr<<e.what()<<endl;
+    return;
+  }
+  
+  if (help || version) {
+    cout<<argv[0]<<" version "<<PACKAGE_VERSION<<'\n'
+	<<"This JACK version ported by Lars Luthman <lars.luthman@gmail.com>\n"
+	<<"from the VST original by Rumpelrausch Täips\n\n";
+    if (help) {
+      cout<<"Program options:\n\n";
+      op.print_help(cout);
+      op.print_env_help(cout);
+    }
+    cout<<flush;
+    return;
+  }
     
   // initialise controls with default values
   float defaults[] = { 0.00, 0.20, 0.20, 0.00, 0.00, 0.75, 0.50, 0.60, 0.60, 
@@ -106,10 +154,9 @@ Main::Main(int& argc, char**& argv) : m_ok(false) {
   }
     
   // initialise LASH
-  if (!init_lash(argc, argv, jack_get_client_name(m_jack_client), 
-		 m_started_by_lashd))
+  if (!init_lash(lash_args, jack_get_client_name(m_jack_client)))
     return;
-    
+  
   m_win->set_title("AZR-3");
   m_win->set_resizable(false);
   m_win->add(*m_gui);
@@ -342,14 +389,7 @@ bool Main::check_lash_events() {
 }
 
 
-bool Main::init_lash(int& argc, char**& argv, 
-		     const std::string& jack_name, bool& started_by_lashd) {
-  
-  /* this is a bit dumb, but the only way I know of to check whether we were
-     started by lashd is to see if lash_extract_args() removes any arguments */
-  int old_argc = argc;  
-  lash_args_t* lash_args = lash_extract_args(&argc, &argv);
-  started_by_lashd = (argc != old_argc);
+bool Main::init_lash(lash_args_t* lash_args, const std::string& jack_name) {
   
   m_lash_client = lash_init(lash_args, "AZR-3", 
 			    LASH_Config_File, LASH_PROTOCOL(2, 0));
@@ -376,15 +416,14 @@ void Main::auto_connect() {
 
   const char* env;
   const char** port_list;
-  const char** our_ports;
   const char* name = jack_get_client_name(m_jack_client);
 
   // MIDI input
-  if ((env = getenv("AZR3_JACK_MIDI_INPUT"))) {
+  if (m_auto_midi != "") {
 
     // if it's a client, connect to the first MIDI output port
-    if (index(env, ':') == NULL &&
-	(port_list = jack_get_ports(m_jack_client, (string(env) + ":*").c_str(),
+    if (m_auto_midi.find(':') == string::npos &&
+	(port_list = jack_get_ports(m_jack_client, (m_auto_midi + ":*").c_str(),
 				    JACK_DEFAULT_MIDI_TYPE, 
 				    JackPortIsOutput)) && port_list[0]) {
       jack_connect(m_jack_client, port_list[0], jack_port_name(m_midi_port));
@@ -393,16 +432,17 @@ void Main::auto_connect() {
 
     // if not, connect to that port
     else
-      jack_connect(m_jack_client, env, jack_port_name(m_midi_port));
-
+      jack_connect(m_jack_client, m_auto_midi.c_str(), 
+		   jack_port_name(m_midi_port));
   }
 
   // audio output
-  if ((env = getenv("AZR3_JACK_AUDIO_OUTPUT"))) {
+  if (m_auto_audio != "") {
     
     // if it's a client, connect individual ports
-    if (index(env, ':') == NULL &&
-	(port_list = jack_get_ports(m_jack_client, (string(env) + ":*").c_str(),
+    if (m_auto_audio.find(':') == string::npos &&
+	(port_list = jack_get_ports(m_jack_client, 
+				    (m_auto_audio + ":*").c_str(),
 				    JACK_DEFAULT_AUDIO_TYPE, 
 				    JackPortIsInput)) && port_list[0]) {
       if (port_list[0])
@@ -414,8 +454,10 @@ void Main::auto_connect() {
 
     // if not, connect all our ports to that single port
     else {
-      jack_connect(m_jack_client, jack_port_name(m_left_port), env);
-      jack_connect(m_jack_client, jack_port_name(m_right_port), env);
+      jack_connect(m_jack_client, 
+		   jack_port_name(m_left_port), m_auto_audio.c_str());
+      jack_connect(m_jack_client, 
+		   jack_port_name(m_right_port), m_auto_audio.c_str());
     }
   }
 }
