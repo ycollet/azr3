@@ -44,6 +44,7 @@ Main::Main(int& argc, char**& argv) : m_ok(false) {
   bool help(false);
   bool version(false);
   unsigned preset_no(128);
+  string jack_name("AZR-3");
   try {
     op.set_env_prefix("AZR3_JACK_")
       .add_bare("help", "h", help, 
@@ -63,6 +64,10 @@ Main::Main(int& argc, char**& argv) : m_ok(false) {
       .add("preset", "p", "NUMBER", preset_no,
 	   "Load the preset with the given number instead of\n"
 	   "the first available one.")
+      .add("jack-name", "j", "NAME", jack_name,
+	   "Set the name of the JACK client. The default is\n"
+	   "'AZR-3'. Note that JACK may change this name by\n"
+	   "e.g. adding a number at the end if needed.")
       .parse_env()
       .parse(argc, argv);
   }
@@ -111,7 +116,7 @@ Main::Main(int& argc, char**& argv) : m_ok(false) {
   }
     
   // initialise JACK client
-  m_jack_client = jack_client_open("AZR-3", jack_options_t(0), 0);
+  m_jack_client = jack_client_open(jack_name.c_str(), jack_options_t(0), 0);
   m_midi_port = jack_port_register(m_jack_client, "MIDI", 
 				   JACK_DEFAULT_MIDI_TYPE, 
 				   JackPortIsInput, 0);
