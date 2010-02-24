@@ -2,7 +2,7 @@
 .\" First parameter, NAME, should be all caps
 .\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
 .\" other parameters are allowed: see man(7), man(1)
-.TH AZR3 1 "December  24, 2007"
+.TH AZR3 1 "February  24, 2010"
 .\" Please adjust this date whenever revising the manpage.
 .\"
 .\" Some roff macros, for reference:
@@ -18,23 +18,63 @@
 .SH NAME
 azr3 \- Organ synth with distortion and rotating speakers
 .SH SYNOPSIS
-.B azr3
+
+.B azr3 --help
+.br
+.B azr3 --version
+.br
+.B azr3 
+.B [-a \fIPORT|CLIENT\fP]
+.B [-j \fINAME\fP]
+.B [-m \fIPORT|CLIENT\fP]
+.B [-p \fINUMBER\fP]
+
 .SH DESCRIPTION
-This manual page documents briefly the
-.B azr3
-command.
-.PP
-.\" TeX users may be more comfortable with the \fB<whatever>\fP and
-.\" \fI<whatever>\fP escape sequences to invode bold face and italics, 
-.\" respectively.
 azr3 is a port of Rumpelrausch Taips' VST plugin AZR-3 which 
 simulates a drawbar organ with a distorting amplifier and a rotating speaker 
 cabinet. This version is a JACK client that can be connected to any other 
 MIDI and audio software using JACK.
 .br
+
+.TP
+.B -a, --audio-output=PORT|CLIENT
+When used, azr3 will try to connect its audio output ports to PORT (if it's
+a JACK port name) or the first two audio input ports in CLIENT (if it's a
+JACK client name).
+
+.TP
+.B -h, --help
+Display a help text and exit.
+
+.TP
+.B -j, --jack-name=NAME
+Set the name of the JACK client. The default is \fBAZR-3\fP. Note that JACK may
+change this name by e.g. adding a number at the end if needed.
+
+.TP
+.B -m, --midi-input=PORT|CLIENT
+
+When used, azr3 will try to connect its MIDI input port to PORT (if it's a
+JACK port name) or the first MIDI output port in CLIENT (if it's a JACK
+client name).
+
+.TP
+.B -p, --preset=NUMBER
+Load the preset with the given number instead of the first available one.
+
+.TP
+.B -v, --version
+Display version information and exit.
+
+.P
+All program options can also be set using environment variables.
+The variable names are the same as the long option names with all
+letters in upper case, all \fB-\fP changed to \fB_\fP and the prefix
+\fBAZR3_JACK_\fP added.
+
+Command line options override environment variables.
 .SH AUTHOR
 The original VST version was written by Philipp Mott, this JACK port by
 Lars Luthman.
 .PP
-This manual page was written by Lars Luthman <lars.luthman@gmail.com>,
-for the Debian project (but may be used by others).
+This manual page was written by Lars Luthman <lars.luthman@gmail.com>.
