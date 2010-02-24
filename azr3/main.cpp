@@ -43,6 +43,7 @@ Main::Main(int& argc, char**& argv) : m_ok(false) {
   OptionParser op;
   bool help(false);
   bool version(false);
+  unsigned preset_no(128);
   try {
     op.set_env_prefix("AZR3_JACK_")
       .add_bare("help", "h", help, 
@@ -59,6 +60,9 @@ Main::Main(int& argc, char**& argv) : m_ok(false) {
 	   "output ports to PORT (if it's a JACK port name) or\n"
 	   "the first two audio input ports in CLIENT (if it's\n"
 	   "a JACK client name).")
+      .add("preset", "p", "NUMBER", preset_no,
+	   "Load the preset with the given number instead of\n"
+	   "the first available one.")
       .parse_env()
       .parse(argc, argv);
   }
@@ -145,11 +149,15 @@ Main::Main(int& argc, char**& argv) : m_ok(false) {
   for (uint32_t i = 0; i < 63; ++i)
     m_gui->set_control(i, m_gui_controls[i]);
     
-  // find and use the first preset
-  for (int i = 0; i < 128; ++i) {
-    if (!m_presets[i].empty) {
-      gui_set_preset(i);
-      break;
+  // try to load the desired preset, if it doesn't work use the first one
+  if (preset_no < 128 && !m_presets[preset_no].empty)
+    gui_set_preset(preset_no);
+  else {
+    for (int i = 0; i < 128; ++i) {
+      if (!m_presets[i].empty) {
+	gui_set_preset(i);
+	break;
+      }
     }
   }
     
