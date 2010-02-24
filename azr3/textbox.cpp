@@ -47,7 +47,7 @@ Textbox::Textbox(int width, int height, int lines)
   cmap->alloc_color(m_color);
   
   set_string(0, "AZR-3 JACK");
-  
+  add_events(BUTTON_PRESS_MASK);
   set_size_request(width, height);
 }
   
