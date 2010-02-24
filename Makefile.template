@@ -11,6 +11,7 @@ pkgdocdir = $(docdir)/$(PACKAGE_NAME)
 includedir = $(prefix)/include
 pkgincludedir = $(includedir)/$(PACKAGE_NAME)
 lv2plugindir = $(libdir)/lv2
+mandir = $(datadir)/man
 LV2PEG = lv2peg
 
 # Don't modify any variables below this line
@@ -352,6 +353,9 @@ install-docs: $(DOCS)
 	$(if $(DOCS),mkdir -p $(DESTDIR)/$(pkgdocdir))
 	$(if $(DOCS),cp $(DOCS) $(DESTDIR)/$(pkgdocdir))
 
+install-manuals: $(MANUALS)
+	$(foreach manpage,$(MANUALS),man_section=`echo $(manpage) | sed 's/.*\.\([0-9]\)/\1/'`; mkdir -p $(DESTDIR)/$(mandir)/man$$man_section; gzip -c $(manpage) > $(DESTDIR)/$(mandir)/man$$man_section/`basename $(manpage)`.gz)
+
 install-pcfiles: $(PCFILES)
 	$(if $(PCFILES),mkdir -p $(DESTDIR)/$(libdir)/pkgconfig)
 	$(if $(PCFILES),@echo Installing pkg-config-files...)
@@ -365,13 +369,13 @@ install-pcfiles: $(PCFILES)
 
 install-datapacks: $(patsubst %,install-%,$(subst .,_,$(DATAPACKS)))
 
-install: install-archives install-libraries install-modules install-programs install-lv2-plugins install-data install-docs install-pcfiles install-datapacks
+install: install-archives install-libraries install-modules install-programs install-lv2-plugins install-data install-docs install-manuals install-pcfiles install-datapacks
 
 
 # DISTRIBUTION
 THIS_FILE = $(patsubst ./%,%,$(firstword $(filter %/Makefile.template,$(patsubst %,./%,$(MAKEFILE_LIST)))))
 CONFIGURE_SCRIPT = $(if $(__path_to_configure),$(__path_to_configure),configure)
-ALL_DIST_FILES = $(sort $(ALL_SOURCES) $(DATA) $(DOCS) $(EXTRA_DIST) $(ALL_DATA))
+ALL_DIST_FILES = $(sort $(ALL_SOURCES) $(DATA) $(DOCS) $(MANUALS) $(EXTRA_DIST) $(ALL_DATA))
 dist: 
 	rm -rf $(PACKAGE_NAME)-$(PACKAGE_VERSION)
 	rm -rf $(PACKAGE_NAME)-$(PACKAGE_VERSION).tar.bz2

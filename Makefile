@@ -5,6 +5,8 @@ PKG_DEPS = gtkmm-2.4>=2.8.8 jack>=0.103.0 lash-1.0>=0.5.3
 
 PROGRAMS = azr3
 
+MANUALS = debian/azr3.1
+
 azr3_SOURCES = \
 	main.cpp main.hpp \
 	azr3.cpp azr3.hpp \
