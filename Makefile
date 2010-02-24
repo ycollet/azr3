@@ -1,11 +1,11 @@
 PACKAGE_NAME = azr3-jack
-PACKAGE_VERSION = $(shell git describe --match 'Version_*' | sed 's/Version_//' | sed 's/-/ /g' | awk '{ print $$1 " " $$2}' | sed -r 's/\.([0-9]+) / \1 /' | awk '{ print $$1 "." $$2+$$3 }')$(shell if test $$(git ls-files --modified | wc -l) -gt 0 ; then echo .EDITED; fi)
+PACKAGE_VERSION = $(shell ./VERSION)
 PKG_DEPS = gtkmm-2.4>=2.8.8 jack>=0.103.0 lash-1.0>=0.5.3
 
 
 PROGRAMS = azr3
 
-MANUALS = debian/azr3.1
+MANUALS = azr3.1
 
 azr3_SOURCES = \
 	main.cpp main.hpp \

@@ -47,7 +47,6 @@ binary-arch: build install
 	dh_installexamples
 	dh_installmenu
 	dh_installcron
-	dh_installman $(CURDIR)/debian/azr3.1
 	dh_installinfo
 	dh_installchangelogs ChangeLog
 	dh_link
