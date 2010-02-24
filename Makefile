@@ -1,5 +1,14 @@
 PACKAGE_NAME = azr3-jack
 PACKAGE_VERSION = $(shell ./VERSION)
+define PACKAGE_DESCRIPTION
+This JACK program is a port of the free VST plugin AZR-3. It is a
+tonewheel organ with drawbars, distortion and rotating speakers.
+The original was written by Rumpelrausch Täips.
+endef
+PACKAGE_WEBPAGE = "http://ll-plugins.nongnu.org/azr3/"
+PACKAGE_BUGTRACKER = "https://savannah.nongnu.org/bugs/?group=ll-plugins"
+PACKAGE_VC = "http://git.savannah.gnu.org/cgit/ll-plugins/azr3-jack.git/"
+
 PKG_DEPS = gtkmm-2.4>=2.8.8 jack>=0.103.0 lash-1.0>=0.5.3
 
 
