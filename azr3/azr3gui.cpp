@@ -74,13 +74,13 @@ AZR3GUI::AZR3GUI()
   m_tbox->add_events(SCROLL_MASK);
   m_tbox->signal_scroll_display.
     connect(mem_fun(*this, &AZR3GUI::display_scroll));
-  Menu* menu = create_menu();
-  m_tbox->signal_button_press_event().
-    connect(bind(mem_fun(*this, &AZR3GUI::popup_menu), menu));
   m_splitpoint_adj = new Adjustment(0, 0, 1);
   m_adj[n_splitpoint] = m_splitpoint_adj;
   m_splitpoint_adj->signal_value_changed().
     connect(mem_fun(*this, &AZR3GUI::splitpoint_changed));
+  Menu* menu = create_menu();
+  m_tbox->signal_button_press_event().
+    connect(bind(mem_fun(*this, &AZR3GUI::popup_menu), menu));
   
   // keyboard split switch
   m_splitswitch = add_switch(m_fbox, -1, 537, 49, Switch::Mini);
@@ -496,6 +496,21 @@ void AZR3GUI::update_program_menu() {
 }
 
 
+void AZR3GUI::update_split_menu() {
+  m_split_menu->items().clear();
+  for (int i = 0; i < 128; ++i) {
+    MenuItem* item = manage(new MenuItem(note2str(i)));
+    item->signal_activate().
+      connect(bind(mem_fun(*m_splitpoint_adj, &Adjustment::set_value),
+		   i / 128.0));
+    m_split_menu->items().push_back(*item);
+    item->show();
+    item->get_child()->modify_bg(STATE_NORMAL, m_menu_bg);
+    item->get_child()->modify_fg(STATE_NORMAL, m_menu_fg);
+  }
+}
+
+
 Menu* AZR3GUI::create_menu() {
   
   m_menu_bg.set_rgb(16000, 16000, 16000);
@@ -504,6 +519,9 @@ Menu* AZR3GUI::create_menu() {
   
   m_program_menu = manage(new Menu);
   update_program_menu();
+  
+  m_split_menu = manage(new Menu);
+  update_split_menu();
   
   MenuItem* program_item = manage(new MenuItem("Select program"));
   program_item->set_submenu(*m_program_menu);
@@ -518,13 +536,22 @@ Menu* AZR3GUI::create_menu() {
   save_item->get_child()->modify_fg(STATE_NORMAL, m_menu_bg);
   save_item->get_child()->modify_fg(STATE_NORMAL, m_menu_fg);
   
+  MenuItem* split_item = manage(new MenuItem("Set keyboard split"));
+  split_item->set_submenu(*m_split_menu);
+  split_item->show();
+  split_item->get_child()->modify_fg(STATE_NORMAL, m_menu_bg);
+  split_item->get_child()->modify_fg(STATE_NORMAL, m_menu_fg);
+  
   menu->items().push_back(*program_item);
   menu->items().push_back(*save_item);
+  menu->items().push_back(*split_item);
   
   menu->modify_bg(STATE_NORMAL, m_menu_bg);
   menu->modify_fg(STATE_NORMAL, m_menu_fg);
   m_program_menu->modify_bg(STATE_NORMAL, m_menu_bg);
   m_program_menu->modify_fg(STATE_NORMAL, m_menu_fg);
+  m_split_menu->modify_bg(STATE_NORMAL, m_menu_bg);
+  m_split_menu->modify_fg(STATE_NORMAL, m_menu_fg);
   
   return menu;
 }

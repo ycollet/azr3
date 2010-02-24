@@ -80,6 +80,7 @@ protected:
   bool change_mode(bool fx_mode, Gtk::Fixed& fbox);
   void splitpoint_changed();
   void update_program_menu();
+  void update_split_menu();
   Gtk::Menu* create_menu();
   bool popup_menu(GdkEventButton* event, Gtk::Menu* menu);
   void display_scroll(int line, GdkEventScroll* e);
@@ -96,6 +97,7 @@ protected:
   Switch* m_splitswitch;
   Gtk::Adjustment* m_splitpoint_adj;
   Gtk::Menu* m_program_menu;
+  Gtk::Menu* m_split_menu;
   Gdk::Color m_menu_bg;
   Gdk::Color m_menu_fg;
   Gtk::Fixed m_fbox;
