@@ -441,7 +441,7 @@ test-report: $(TESTS)
 # RELEASE ANNOUNCEMENT
 export PACKAGE_DESCRIPTION
 release-mail:
-	@echo "$(PACKAGE_NAME) $(PACKAGE_VERSION) has been released."
+	@echo "$(PACKAGE_DISPLAY_NAME) $(PACKAGE_VERSION) has been released."
 	@echo ""
 	@echo "$$PACKAGE_DESCRIPTION"
 	@echo ""

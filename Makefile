@@ -1,5 +1,6 @@
 PACKAGE_NAME = azr3-jack
 PACKAGE_VERSION = $(shell ./VERSION)
+PACKAGE_DISPLAY_NAME = AZR3-JACK
 define PACKAGE_DESCRIPTION
 This JACK program is a port of the free VST plugin AZR-3. It is a
 tonewheel organ with drawbars, distortion and rotating speakers.
