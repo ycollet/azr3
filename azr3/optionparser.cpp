@@ -21,7 +21,7 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 01222-1307  USA
 
 ****************************************************************************/
-#include "options.hpp"
+#include "optionparser.hpp"
 
 #include <cctype>
 #include <cstdlib>

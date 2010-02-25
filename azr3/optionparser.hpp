@@ -21,8 +21,8 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 01222-1307  USA
 
 ****************************************************************************/
-#ifndef OPTIONS_HPP
-#define OPTIONS_HPP
+#ifndef OPTIONPARSER_HPP
+#define OPTIONPARSER_HPP
 
 #include <iostream>
 #include <map>

@@ -24,7 +24,7 @@ azr3_SOURCES = \
 	filters.hpp \
 	fx.hpp fx.cpp \
 	newjack.hpp \
-	options.cpp options.hpp \
+	optionparser.cpp optionparser.hpp \
 	voice_classes.hpp voice_classes.cpp \
 	azr3gui.cpp azr3gui.hpp \
 	knob.hpp knob.cpp \

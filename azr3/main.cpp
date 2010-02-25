@@ -26,7 +26,7 @@
 #include <stdexcept>
 
 #include "main.hpp"
-#include "options.hpp"
+#include "optionparser.hpp"
 
 using namespace std;
 
