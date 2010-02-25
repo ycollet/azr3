@@ -1,17 +1,15 @@
-1. Make sure the version will be right (for a new minor version that means that
-   you should set the patch level to -1 so dcvs will bump it to 0)
+1. Write ChangeLog entry.
 
-2. Write ChangeLog entry.
+2. make dist, check that it builds and installs correctly.
 
-3. make dist, check that it builds and installs correctly.
-
-4. Commit (git commit -a), tag as Release_X_Y_Z (git tag -s Release_X_Y_Z) 
+3. Commit (git commit -a), tag as Release_X.Y.Z (git tag -s Release_X.Y.Z) 
    and push (git push).
 
-5. Make new tarball, sign (gpg -b) and upload dist tarball 
+4. Make new tarball, sign (gpg -b) and upload dist tarball 
    (sftp larsl@dl.sv.nongnu.org:/releases/ll-plugins).
 
-6. Update webpages (including changelog).
+5. Update webpages (including changelog).
 
-7. Announce on http://freshmeat.net and any relevant mailing lists (only
-   do mailing lists for minor and major version bumps).
+6. Announce on http://freshmeat.net and any relevant mailing lists
+   (make release-mail) (only do mailing lists for minor (Y) and major (X)
+   version bumps).
