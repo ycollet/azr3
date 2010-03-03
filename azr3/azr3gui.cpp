@@ -476,6 +476,7 @@ void AZR3GUI::splitpoint_changed() {
     m_tbox->set_string(2, string("Splitpoint: ") + note2str(key));
     m_splitswitch->get_adjustment().set_value(1);
   }
+  control_changed(n_splitpoint, value);
 }
 
 
