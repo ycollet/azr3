@@ -37,29 +37,29 @@ MIDI and audio software using JACK.
 .br
 
 .TP
-.B -a, --audio-output=PORT|CLIENT
+\fB -a, --audio-output\fP=\fIPORT|CLIENT\fP
 When used, azr3 will try to connect its audio output ports to PORT (if it's
 a JACK port name) or the first two audio input ports in CLIENT (if it's a
 JACK client name).
 
 .TP
-.B -h, --help
+\fB -h, --help\fP
 Display a help text and exit.
 
 .TP
-.B -j, --jack-name=NAME
+\fB -j, --jack-name\fP=\fINAME\fP
 Set the name of the JACK client. The default is \fBAZR-3\fP. Note that JACK may
 change this name by e.g. adding a number at the end if needed.
 
 .TP
-.B -m, --midi-input=PORT|CLIENT
+\fB -m, --midi-input\fP=\fIPORT|CLIENT\fP
 
 When used, azr3 will try to connect its MIDI input port to PORT (if it's a
 JACK port name) or the first MIDI output port in CLIENT (if it's a JACK
 client name).
 
 .TP
-.B -p, --preset=NUMBER
+\fB -p, --preset\fP=\fINUMBER\fP
 Load the preset with the given number instead of the first available one.
 
 .TP
