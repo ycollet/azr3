@@ -2,8 +2,8 @@ Version 1.2.0 (ONGOING):
 	* Added a man page
 	* Added command line options for auto-connecting MIDI and audio
 	  ports, setting JACK client name and loading presets
-	* Converted the XPM graphics to PNG to save process memory,
-	  installation size and tarball size
+	* Converted the XPM graphics to PNG to save process memory and
+	  installation size
 
 Version 1.0.3 (2008-05-15):
 	* Fixed some #include bugs that were only exposed in GCC 4.3
