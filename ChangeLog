@@ -1,4 +1,4 @@
-Version 1.2.0 (ONGOING):
+Version 1.2.0 (2010-03-05):
 	* Added a man page
 	* Added command line options for auto-connecting MIDI and audio
 	  ports, setting JACK client name and loading presets
