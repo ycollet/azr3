@@ -273,7 +273,8 @@ void AZR3GUI::on_realize() {
 
   
 string AZR3GUI::note2str(long note) {
-  static char notestr[4];
+  note = (note < 0 ? 0 : note > 127 ? 127 : note);
+  static char notestr[5];
   int octave = int(note / 12);
   switch(note % 12)
     {
