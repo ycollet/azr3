@@ -1,3 +1,6 @@
+Version 1.2.3 (2010-03-12):
+	* Fixed a crashing bug reported by Alexandre Prokoudine
+
 Version 1.2.0 (2010-03-05):
 	* Added a man page
 	* Added command line options for auto-connecting MIDI and audio
