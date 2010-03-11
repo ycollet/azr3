@@ -11,5 +11,4 @@
 5. Update webpages (including changelog).
 
 6. Announce on http://freshmeat.net and any relevant mailing lists
-   (make release-mail) (only do mailing lists for minor (Y) and major (X)
-   version bumps).
+   (make release-mail).
