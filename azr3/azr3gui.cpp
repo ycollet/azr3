@@ -332,7 +332,7 @@ void AZR3GUI::set_back_pixmap(Widget* wdg, RefPtr<Pixmap> pm) {
 }
 
 
-Knob* AZR3GUI::add_knob(Fixed& fbox, RefPtr<Pixmap>& pm, int port, 
+Knob* AZR3GUI::add_knob(Fixed& fbox, RefPtr<Pixmap>& pm, size_t port, 
 			float min, float max, float value, 
 			int xoffset, int yoffset,
 			float dmin, float dmax, bool decimal) {
@@ -350,7 +350,7 @@ Knob* AZR3GUI::add_knob(Fixed& fbox, RefPtr<Pixmap>& pm, int port,
   s->set_bg_pixmap(STATE_SELECTED, npm);
   s->set_bg_pixmap(STATE_INSENSITIVE, npm);
   knob->set_style(s);
-  if (port >= 0 && port < m_adj.size()) {
+  if (port < m_adj.size()) {
     knob->get_adjustment().signal_value_changed().
       connect(compose(bind<0>(mem_fun(*this, &AZR3GUI::control_changed), port),
 		      mem_fun(knob->get_adjustment(), 
@@ -362,7 +362,7 @@ Knob* AZR3GUI::add_knob(Fixed& fbox, RefPtr<Pixmap>& pm, int port,
 }
 
 
-Drawbar* AZR3GUI::add_drawbar(Fixed& fbox, RefPtr<Pixmap>& pm, int port, 
+Drawbar* AZR3GUI::add_drawbar(Fixed& fbox, RefPtr<Pixmap>& pm, size_t port, 
 			      float min, float max, float value, 
 			      int xoffset, int yoffset, 
 			      Drawbar::Type type) {
@@ -380,7 +380,7 @@ Drawbar* AZR3GUI::add_drawbar(Fixed& fbox, RefPtr<Pixmap>& pm, int port,
   s->set_bg_pixmap(STATE_SELECTED, npm);
   s->set_bg_pixmap(STATE_INSENSITIVE, npm);
   db->set_style(s);
-  if (port >= 0 && port < m_adj.size()) {
+  if (port < m_adj.size()) {
     db->get_adjustment().signal_value_changed().
       connect(compose(bind<0>(mem_fun(*this, &AZR3GUI::control_changed), port),
 		      mem_fun(db->get_adjustment(), &Adjustment::get_value)));
@@ -391,7 +391,7 @@ Drawbar* AZR3GUI::add_drawbar(Fixed& fbox, RefPtr<Pixmap>& pm, int port,
 }
 
 
-Switch* AZR3GUI::add_switch(Fixed& fbox, int port,
+Switch* AZR3GUI::add_switch(Fixed& fbox, size_t port,
 			    int xoffset, int yoffset, Switch::Type type) {
   Switch* sw = manage(new Switch(type));
   fbox.put(*sw, xoffset, yoffset);

@@ -62,15 +62,15 @@ protected:
   
   void splitbox_clicked();
   void set_back_pixmap(Widget* wdg, Glib::RefPtr<Gdk::Pixmap> pm);
-  Knob* add_knob(Gtk::Fixed& fbox, Glib::RefPtr<Gdk::Pixmap>& pm, int port, 
+  Knob* add_knob(Gtk::Fixed& fbox, Glib::RefPtr<Gdk::Pixmap>& pm, size_t port, 
                  float min, float max, float value, 
                  int xoffset, int yoffset,
                  float dmin, float dmax, bool decimal);
   Drawbar* add_drawbar(Gtk::Fixed& fbox, Glib::RefPtr<Gdk::Pixmap>& pm,
-		       int port, float min, float max, float value, 
+		       size_t port, float min, float max, float value, 
                        int xoffset, int yoffset, 
                        Drawbar::Type type);
-  Switch* add_switch(Gtk::Fixed& fbox, int port,
+  Switch* add_switch(Gtk::Fixed& fbox, size_t port,
                      int xoffset, int yoffset, Switch::Type type);
   Gtk::EventBox* add_clickbox(Gtk::Fixed& fbox, int xoffset, int yoffset, 
 			      int width, int height);

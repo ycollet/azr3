@@ -427,9 +427,7 @@ int Main::static_process(jack_nframes_t frames, void* arg) {
 
 void Main::auto_connect() {
 
-  const char* env;
   const char** port_list;
-  const char* name = jack_get_client_name(m_jack_client);
 
   // MIDI input
   if (m_auto_midi != "") {
