@@ -142,7 +142,7 @@ AZR3GUI::AZR3GUI()
   Widget* eb = add_clickbox(m_fbox, 14, 319, 14, 44);
   eb->signal_button_press_event().
     connect(sigc::hide(bind(bind(mem_fun(*this, &AZR3GUI::change_mode), 
-				 ref(m_fbox)), false)));
+				 sigc::ref(m_fbox)), false)));
   m_fx_widgets.push_back(eb);
   
   // Mr Valve controls
@@ -183,7 +183,7 @@ AZR3GUI::AZR3GUI()
   Widget* eb2 = add_clickbox(m_vbox, 14, 53, 14, 44);
   eb2->signal_button_press_event().
     connect(sigc::hide(bind(bind(mem_fun(*this, &AZR3GUI::change_mode), 
-				 ref(m_fbox)), true)));
+				 sigc::ref(m_fbox)), true)));
 
   // vibrato controls
   add_switch(m_vbox, n_1_vibrato, 39, 17, Switch::Green);
