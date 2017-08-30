@@ -32,7 +32,7 @@ azr3_SOURCES = \
 	drawbar.hpp drawbar.cpp \
 	textbox.hpp textbox.cpp
 azr3_SOURCEDIR = azr3
-azr3_CFLAGS = `pkg-config --cflags gtkmm-2.4 jack lash-1.0` -DDATADIR=\"$(pkgdatadir)\"
+azr3_CFLAGS = -O2 `pkg-config --cflags gtkmm-2.4 jack lash-1.0` -DDATADIR=\"$(pkgdatadir)\"
 azr3_LDFLAGS = `pkg-config --libs gtkmm-2.4 jack lash-1.0` -lpthread
 azr3_cpp_CFLAGS = $(shell if pkg-config --atleast-version=0.107 jack ; then echo -include azr3/newjack.hpp; fi)
 main_cpp_CFLAGS = -DPACKAGE_VERSION=\"$(PACKAGE_VERSION)\"
